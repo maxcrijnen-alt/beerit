@@ -222,6 +222,7 @@ export function GameForm({
         move={cards.move}
         register={form.register}
         remove={cards.remove}
+        setValue={form.setValue}
       />
       {form.formState.errors.cards?.message ? (
         <p className="text-sm text-destructive">

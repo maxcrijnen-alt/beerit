@@ -8,6 +8,7 @@ import type {
   UseFieldArrayMove,
   UseFieldArrayRemove,
   UseFormRegister,
+  UseFormSetValue,
 } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +30,7 @@ interface GameCardEditorProps {
   move: UseFieldArrayMove;
   register: UseFormRegister<GameFormValues>;
   remove: UseFieldArrayRemove;
+  setValue: UseFormSetValue<GameFormValues>;
 }
 
 function createCard(
@@ -51,6 +53,7 @@ export function GameCardEditor({
   move,
   register,
   remove,
+  setValue,
 }: GameCardEditorProps) {
   return (
     <section className="space-y-3">
@@ -154,7 +157,13 @@ export function GameCardEditor({
                 <Label htmlFor={`cards.${index}.cardType`}>Type</Label>
                 <Select
                   id={`cards.${index}.cardType`}
-                  {...register(`cards.${index}.cardType`)}
+                  {...register(`cards.${index}.cardType`, {
+                    onChange(e) {
+                      const t = e.target.value as GameFormValues["cards"][number]["cardType"];
+                      setValue(`cards.${index}.activityKind` as `cards.${number}.activityKind`, t === "ACTIVITY" ? "OTHER" : null);
+                      setValue(`cards.${index}.timerSeconds` as `cards.${number}.timerSeconds`, t === "TIMED_EVENT" ? 20 : null);
+                    },
+                  })}
                 >
                   {GAME_CARD_TYPES.map((value) => (
                     <option key={value} value={value}>
