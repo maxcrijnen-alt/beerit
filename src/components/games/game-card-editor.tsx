@@ -1,0 +1,232 @@
+"use client";
+
+import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import type {
+  FieldErrors,
+  FieldArrayWithId,
+  UseFieldArrayAppend,
+  UseFieldArrayMove,
+  UseFieldArrayRemove,
+  UseFormRegister,
+} from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import type { GameFormValues } from "@/lib/validation/games";
+import {
+  GAME_ACTIVITY_KINDS,
+  GAME_CARD_TYPES,
+  GAME_INTENSITIES,
+} from "@/types/database";
+
+interface GameCardEditorProps {
+  append: UseFieldArrayAppend<GameFormValues, "cards">;
+  errors: FieldErrors<GameFormValues>;
+  fields: FieldArrayWithId<GameFormValues, "cards", "id">[];
+  move: UseFieldArrayMove;
+  register: UseFormRegister<GameFormValues>;
+  remove: UseFieldArrayRemove;
+}
+
+function createCard(
+  cardType: GameFormValues["cards"][number]["cardType"],
+): GameFormValues["cards"][number] {
+  return {
+    activityKind: cardType === "ACTIVITY" ? "OTHER" : null,
+    beeritsValue: 1,
+    cardType,
+    intensity: "Funny",
+    text: "",
+    timerSeconds: cardType === "TIMED_EVENT" ? 20 : null,
+  };
+}
+
+export function GameCardEditor({
+  append,
+  errors,
+  fields,
+  move,
+  register,
+  remove,
+}: GameCardEditorProps) {
+  return (
+    <section className="space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h2 className="font-semibold">Cards</h2>
+          <p className="text-xs text-muted-foreground">
+            Players will move through these in order.
+          </p>
+        </div>
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button
+            onClick={() => append(createCard("QUESTION"))}
+            size="sm"
+            type="button"
+            variant="secondary"
+          >
+            <Plus className="size-3.5" />
+            Question
+          </Button>
+          <Button
+            onClick={() => append(createCard("DARE"))}
+            size="sm"
+            type="button"
+            variant="secondary"
+          >
+            <Plus className="size-3.5" />
+            Dare
+          </Button>
+          <Button
+            onClick={() => append(createCard("ACTIVITY"))}
+            size="sm"
+            type="button"
+            variant="secondary"
+          >
+            <Plus className="size-3.5" />
+            Activity
+          </Button>
+          <Button
+            onClick={() => append(createCard("TIMED_EVENT"))}
+            size="sm"
+            type="button"
+            variant="secondary"
+          >
+            <Plus className="size-3.5" />
+            Timer
+          </Button>
+        </div>
+      </div>
+      {fields.map((field, index) => (
+        <Card key={field.id}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-sm">Card {index + 1}</CardTitle>
+            <div className="flex items-center gap-1">
+              <Button
+                aria-label={`Move card ${index + 1} up`}
+                disabled={index === 0}
+                onClick={() => move(index, index - 1)}
+                size="icon"
+                type="button"
+                variant="ghost"
+              >
+                <ArrowUp className="size-4" />
+              </Button>
+              <Button
+                aria-label={`Move card ${index + 1} down`}
+                disabled={index === fields.length - 1}
+                onClick={() => move(index, index + 1)}
+                size="icon"
+                type="button"
+                variant="ghost"
+              >
+                <ArrowDown className="size-4" />
+              </Button>
+              <Button
+                aria-label={`Remove card ${index + 1}`}
+                disabled={fields.length === 1}
+                onClick={() => remove(index)}
+                size="icon"
+                type="button"
+                variant="ghost"
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor={`cards.${index}.text`}>Text</Label>
+              <Textarea
+                id={`cards.${index}.text`}
+                placeholder="What should the group do or answer?"
+                {...register(`cards.${index}.text`)}
+              />
+              <p className="text-xs text-destructive">
+                {errors.cards?.[index]?.text?.message}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+              <div className="space-y-2">
+                <Label htmlFor={`cards.${index}.cardType`}>Type</Label>
+                <Select
+                  id={`cards.${index}.cardType`}
+                  {...register(`cards.${index}.cardType`)}
+                >
+                  {GAME_CARD_TYPES.map((value) => (
+                    <option key={value} value={value}>
+                      {value.replaceAll("_", " ")}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`cards.${index}.intensity`}>Intensity</Label>
+                <Select
+                  id={`cards.${index}.intensity`}
+                  {...register(`cards.${index}.intensity`)}
+                >
+                  {GAME_INTENSITIES.map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`cards.${index}.activityKind`}>Activity</Label>
+                <Select
+                  id={`cards.${index}.activityKind`}
+                  {...register(`cards.${index}.activityKind`, {
+                    setValueAs: (value) => value || null,
+                  })}
+                >
+                  <option value="">Not an activity</option>
+                  {GAME_ACTIVITY_KINDS.map((value) => (
+                    <option key={value} value={value}>
+                      {value.replaceAll("_", " ")}
+                    </option>
+                  ))}
+                </Select>
+                <p className="text-xs text-destructive">
+                  {errors.cards?.[index]?.activityKind?.message}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`cards.${index}.beeritsValue`}>Beerits</Label>
+                <Input
+                  id={`cards.${index}.beeritsValue`}
+                  max={20}
+                  min={0}
+                  type="number"
+                  {...register(`cards.${index}.beeritsValue`, {
+                    valueAsNumber: true,
+                  })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`cards.${index}.timerSeconds`}>Timer</Label>
+                <Input
+                  id={`cards.${index}.timerSeconds`}
+                  max={300}
+                  min={5}
+                  placeholder="None"
+                  type="number"
+                  {...register(`cards.${index}.timerSeconds`, {
+                    setValueAs: (value) => (value === "" ? null : Number(value)),
+                  })}
+                />
+                <p className="text-xs text-destructive">
+                  {errors.cards?.[index]?.timerSeconds?.message}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </section>
+  );
+}

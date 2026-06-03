@@ -1,0 +1,9 @@
+project_id = "beerit"
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[auth]
+enable_anonymous_sign_ins = true
+
