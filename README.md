@@ -252,6 +252,16 @@ steps above are the direct setup path.
 The current MVP is deployed at
 [https://beerit.vercel.app](https://beerit.vercel.app).
 
+Recommended setup:
+
+1. Keep this repository on GitHub.
+2. Connect the Vercel project to the GitHub repository.
+3. Let Vercel build production deployments from the `main` branch.
+4. Keep `.vercel` as local CLI metadata only. It is intentionally ignored by
+   Git and should not be committed.
+5. Store real environment variable values in Vercel and `.env.local`, never in
+   the repository.
+
 For a fresh Vercel project:
 
 1. Push this repository to GitHub.
@@ -259,6 +269,27 @@ For a fresh Vercel project:
 3. Add the same environment variables from `.env.local`.
 4. Deploy. Vercel detects the Next.js project automatically.
 5. Apply the Supabase migration and seed before testing product flows.
+
+## Working on feature branches
+
+Use branches for Codex, Claude Code, and future agents:
+
+```bash
+git checkout main
+git pull
+git checkout -b codex/short-task-name
+```
+
+Keep each branch focused on one milestone or bug fix. Before asking another
+agent to review or continue, run:
+
+```bash
+npm run lint
+npm run build
+```
+
+Do not force push or overwrite another agent's work unless the owner explicitly
+approves it.
 
 ## Checks
 
