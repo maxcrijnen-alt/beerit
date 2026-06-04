@@ -5,6 +5,7 @@ import {
   GAME_CATEGORIES,
   GAME_INTENSITIES,
   GAME_VISIBILITIES,
+  TIMER_BEHAVIORS,
 } from "@/types/database";
 
 export const gameEditorCardSchema = z
@@ -14,6 +15,9 @@ export const gameEditorCardSchema = z
     cardType: z.enum(GAME_CARD_TYPES),
     intensity: z.enum(GAME_INTENSITIES),
     text: z.string().trim().min(1, "Enter the card text.").max(600),
+    timerBehavior: z.enum(TIMER_BEHAVIORS),
+    timerMaxSeconds: z.number().int().min(5).max(300).nullable(),
+    timerMinSeconds: z.number().int().min(5).max(300).nullable(),
     timerSeconds: z.number().int().min(5).max(300).nullable(),
   })
   .refine(
@@ -29,11 +33,33 @@ export const gameEditorCardSchema = z
   .refine(
     (values) =>
       values.cardType === "TIMED_EVENT"
-        ? values.timerSeconds !== null
-        : values.timerSeconds === null,
+        ? values.timerBehavior === "FIXED"
+          ? values.timerSeconds !== null
+          : values.timerSeconds === null
+        : values.timerBehavior === "FIXED" && values.timerSeconds === null,
     {
-      message: "Choose a timer only for timed event cards.",
+      message: "Choose a fixed timer only for fixed timed event cards.",
       path: ["timerSeconds"],
+    },
+  )
+  .refine(
+    (values) =>
+      values.cardType === "TIMED_EVENT" && values.timerBehavior === "RANDOM_BOMB"
+        ? values.timerMinSeconds !== null && values.timerMaxSeconds !== null
+        : values.timerMinSeconds === null && values.timerMaxSeconds === null,
+    {
+      message: "Choose a random timer range only for Bomb Mode cards.",
+      path: ["timerMinSeconds"],
+    },
+  )
+  .refine(
+    (values) =>
+      values.timerMinSeconds === null ||
+      values.timerMaxSeconds === null ||
+      values.timerMaxSeconds >= values.timerMinSeconds,
+    {
+      message: "Maximum timer must be at least the minimum.",
+      path: ["timerMaxSeconds"],
     },
   );
 
@@ -100,12 +126,31 @@ function normalizeGameCardPayload(card: unknown) {
 
   const values = card as Record<string, unknown>;
   const cardType = values.cardType;
+  const timerBehavior =
+    cardType === "TIMED_EVENT" && values.timerBehavior === "RANDOM_BOMB"
+      ? "RANDOM_BOMB"
+      : "FIXED";
+  const timerMinSeconds =
+    typeof values.timerMinSeconds === "number" ? values.timerMinSeconds : 20;
+  const timerMaxSeconds =
+    typeof values.timerMaxSeconds === "number"
+      ? Math.max(values.timerMaxSeconds, timerMinSeconds)
+      : Math.max(180, timerMinSeconds);
 
   return {
     ...values,
     activityKind: cardType === "ACTIVITY" ? values.activityKind || "OTHER" : null,
+    timerBehavior,
+    timerMaxSeconds:
+      cardType === "TIMED_EVENT" && timerBehavior === "RANDOM_BOMB"
+        ? timerMaxSeconds
+        : null,
+    timerMinSeconds:
+      cardType === "TIMED_EVENT" && timerBehavior === "RANDOM_BOMB"
+        ? timerMinSeconds
+        : null,
     timerSeconds:
-      cardType === "TIMED_EVENT"
+      cardType === "TIMED_EVENT" && timerBehavior === "FIXED"
         ? values.timerSeconds === "" || values.timerSeconds == null
           ? 20
           : values.timerSeconds

@@ -26,7 +26,9 @@ import {
   GAME_ACTIVITY_KINDS,
   GAME_CARD_TYPES,
   GAME_INTENSITIES,
+  TIMER_BEHAVIORS,
   type GameCardType,
+  type TimerBehavior,
 } from "@/types/database";
 
 interface AddGameCardsFormProps {
@@ -34,14 +36,23 @@ interface AddGameCardsFormProps {
   gameId: string;
 }
 
-function createCard(cardType: GameCardType): NewGameCardsValues["cards"][number] {
+function createCard(
+  cardType: GameCardType,
+  timerBehavior: TimerBehavior = "FIXED",
+): NewGameCardsValues["cards"][number] {
+  const isTimedEvent = cardType === "TIMED_EVENT";
+  const isBombMode = isTimedEvent && timerBehavior === "RANDOM_BOMB";
+
   return {
     activityKind: cardType === "ACTIVITY" ? "OTHER" : null,
     beeritsValue: 1,
     cardType,
     intensity: "Funny",
     text: "",
-    timerSeconds: cardType === "TIMED_EVENT" ? 20 : null,
+    timerBehavior: isTimedEvent ? timerBehavior : "FIXED",
+    timerMaxSeconds: isBombMode ? 180 : null,
+    timerMinSeconds: isBombMode ? 20 : null,
+    timerSeconds: isTimedEvent && !isBombMode ? 20 : null,
   };
 }
 
@@ -65,11 +76,27 @@ export function AddGameCardsForm({
 
   function syncCardFieldsForType(index: number, cardType: GameCardType) {
     const currentActivityKind = watchedCards?.[index]?.activityKind;
+    const currentTimerBehavior = watchedCards?.[index]?.timerBehavior ?? "FIXED";
+    const currentTimerMinSeconds = watchedCards?.[index]?.timerMinSeconds;
+    const currentTimerMaxSeconds = watchedCards?.[index]?.timerMaxSeconds;
     const currentTimerSeconds = watchedCards?.[index]?.timerSeconds;
+    const timerBehavior =
+      cardType === "TIMED_EVENT" ? currentTimerBehavior : "FIXED";
+    const isBombMode = cardType === "TIMED_EVENT" && timerBehavior === "RANDOM_BOMB";
     const timerSeconds =
       typeof currentTimerSeconds === "number" && Number.isFinite(currentTimerSeconds)
         ? currentTimerSeconds
         : 20;
+    const timerMinSeconds =
+      typeof currentTimerMinSeconds === "number" &&
+      Number.isFinite(currentTimerMinSeconds)
+        ? currentTimerMinSeconds
+        : 20;
+    const timerMaxSeconds =
+      typeof currentTimerMaxSeconds === "number" &&
+      Number.isFinite(currentTimerMaxSeconds)
+        ? Math.max(currentTimerMaxSeconds, timerMinSeconds)
+        : 180;
 
     form.setValue(`cards.${index}.cardType`, cardType, {
       shouldDirty: true,
@@ -85,7 +112,77 @@ export function AddGameCardsForm({
     );
     form.setValue(
       `cards.${index}.timerSeconds`,
-      cardType === "TIMED_EVENT" ? timerSeconds : null,
+      cardType === "TIMED_EVENT" && !isBombMode ? timerSeconds : null,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+    form.setValue(`cards.${index}.timerBehavior`, timerBehavior, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    form.setValue(
+      `cards.${index}.timerMinSeconds`,
+      isBombMode ? timerMinSeconds : null,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+    form.setValue(
+      `cards.${index}.timerMaxSeconds`,
+      isBombMode ? timerMaxSeconds : null,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+  }
+
+  function syncTimerBehavior(index: number, timerBehavior: TimerBehavior) {
+    const currentTimerMinSeconds = watchedCards?.[index]?.timerMinSeconds;
+    const currentTimerMaxSeconds = watchedCards?.[index]?.timerMaxSeconds;
+    const currentTimerSeconds = watchedCards?.[index]?.timerSeconds;
+    const timerSeconds =
+      typeof currentTimerSeconds === "number" && Number.isFinite(currentTimerSeconds)
+        ? currentTimerSeconds
+        : 20;
+    const timerMinSeconds =
+      typeof currentTimerMinSeconds === "number" &&
+      Number.isFinite(currentTimerMinSeconds)
+        ? currentTimerMinSeconds
+        : 20;
+    const timerMaxSeconds =
+      typeof currentTimerMaxSeconds === "number" &&
+      Number.isFinite(currentTimerMaxSeconds)
+        ? Math.max(currentTimerMaxSeconds, timerMinSeconds)
+        : 180;
+    const isBombMode = timerBehavior === "RANDOM_BOMB";
+
+    form.setValue(`cards.${index}.timerBehavior`, timerBehavior, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    form.setValue(
+      `cards.${index}.timerSeconds`,
+      isBombMode ? null : timerSeconds,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+    form.setValue(
+      `cards.${index}.timerMinSeconds`,
+      isBombMode ? timerMinSeconds : null,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+    form.setValue(
+      `cards.${index}.timerMaxSeconds`,
+      isBombMode ? timerMaxSeconds : null,
       {
         shouldDirty: true,
         shouldValidate: true,
@@ -149,14 +246,26 @@ export function AddGameCardsForm({
               <Plus className="size-3.5" />
               Add timer
             </Button>
+            <Button
+              onClick={() => cards.append(createCard("TIMED_EVENT", "RANDOM_BOMB"))}
+              size="sm"
+              type="button"
+              variant="secondary"
+            >
+              <Plus className="size-3.5" />
+              Add bomb
+            </Button>
           </div>
         </CardContent>
       </Card>
       {cards.fields.map((field, index) => {
         const selectedCardType =
           watchedCards?.[index]?.cardType ?? field.cardType;
+        const selectedTimerBehavior =
+          watchedCards?.[index]?.timerBehavior ?? field.timerBehavior ?? "FIXED";
         const isActivityCard = selectedCardType === "ACTIVITY";
         const isTimedEventCard = selectedCardType === "TIMED_EVENT";
+        const isBombMode = isTimedEventCard && selectedTimerBehavior === "RANDOM_BOMB";
 
         return (
         <Card key={field.id}>
@@ -185,7 +294,7 @@ export function AddGameCardsForm({
                 {form.formState.errors.cards?.[index]?.text?.message}
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-6">
               <div className="space-y-2">
                 <Label htmlFor={`cards.${index}.cardType`}>Type</Label>
                 <Select
@@ -251,7 +360,63 @@ export function AddGameCardsForm({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor={`cards.${index}.timerSeconds`}>Timer</Label>
+                <Label htmlFor={`cards.${index}.timerBehavior`}>Timer mode</Label>
+                <Select
+                  disabled={!isTimedEventCard}
+                  id={`cards.${index}.timerBehavior`}
+                  {...form.register(`cards.${index}.timerBehavior`, {
+                    onChange: (event) =>
+                      syncTimerBehavior(
+                        index,
+                        event.target.value as TimerBehavior,
+                      ),
+                  })}
+                >
+                  {TIMER_BEHAVIORS.map((value) => (
+                    <option key={value} value={value}>
+                      {value === "RANDOM_BOMB" ? "Bomb mode" : "Fixed timer"}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              {isBombMode ? (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor={`cards.${index}.timerMinSeconds`}>Min</Label>
+                    <Input
+                      id={`cards.${index}.timerMinSeconds`}
+                      max={300}
+                      min={5}
+                      type="number"
+                      {...form.register(`cards.${index}.timerMinSeconds`, {
+                        setValueAs: (value) =>
+                          value === "" ? null : Number(value),
+                      })}
+                    />
+                    <p className="text-xs text-destructive">
+                      {form.formState.errors.cards?.[index]?.timerMinSeconds?.message}
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`cards.${index}.timerMaxSeconds`}>Max</Label>
+                    <Input
+                      id={`cards.${index}.timerMaxSeconds`}
+                      max={300}
+                      min={5}
+                      type="number"
+                      {...form.register(`cards.${index}.timerMaxSeconds`, {
+                        setValueAs: (value) =>
+                          value === "" ? null : Number(value),
+                      })}
+                    />
+                    <p className="text-xs text-destructive">
+                      {form.formState.errors.cards?.[index]?.timerMaxSeconds?.message}
+                    </p>
+                  </div>
+                </>
+              ) : (
+              <div className="space-y-2">
+                <Label htmlFor={`cards.${index}.timerSeconds`}>Seconds</Label>
                 <Input
                   disabled={!isTimedEventCard}
                   id={`cards.${index}.timerSeconds`}
@@ -267,6 +432,7 @@ export function AddGameCardsForm({
                   {form.formState.errors.cards?.[index]?.timerSeconds?.message}
                 </p>
               </div>
+              )}
             </div>
           </CardContent>
         </Card>

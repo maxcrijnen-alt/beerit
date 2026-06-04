@@ -116,6 +116,9 @@ export async function addGameCardsAction(
         intensity: card.intensity,
         position: lastPosition + index + 1,
         text: card.text,
+        timer_behavior: card.timerBehavior,
+        timer_max_seconds: card.timerMaxSeconds,
+        timer_min_seconds: card.timerMinSeconds,
         timer_seconds: card.timerSeconds,
       })),
     );
