@@ -1,7 +1,7 @@
 "use client";
 
 import { Gamepad2 } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { createLobbyAction } from "@/app/lobby/actions";
 import { Button } from "@/components/ui/button";
 import { INITIAL_ACTION_STATE } from "@/lib/auth/action-state";
@@ -10,6 +10,7 @@ import {
   GAME_CATEGORIES,
   type GameActivityKind,
   type GameCategory,
+  type LobbyActivitySelectionMode,
 } from "@/types/database";
 
 interface LobbyCreateFormProps {
@@ -29,6 +30,23 @@ export function LobbyCreateForm({ baseCategory, gameId }: LobbyCreateFormProps) 
     createLobbyAction,
     INITIAL_ACTION_STATE,
   );
+  const [selectionMode, setSelectionMode] =
+    useState<LobbyActivitySelectionMode>("MIXED");
+  const [checkedKinds, setCheckedKinds] = useState<Set<GameActivityKind>>(
+    new Set(),
+  );
+
+  const onlySelectedButEmpty =
+    selectionMode === "ONLY_SELECTED" && checkedKinds.size === 0;
+
+  function toggleKind(kind: GameActivityKind, checked: boolean) {
+    setCheckedKinds((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(kind);
+      else next.delete(kind);
+      return next;
+    });
+  }
 
   return (
     <form action={action} className="space-y-3">
@@ -78,6 +96,7 @@ export function LobbyCreateForm({ baseCategory, gameId }: LobbyCreateFormProps) 
             defaultChecked
             className="mt-0.5 size-4 shrink-0 accent-primary"
             name="activitySelectionMode"
+            onChange={() => setSelectionMode("MIXED")}
             type="radio"
             value="MIXED"
           />
@@ -93,22 +112,34 @@ export function LobbyCreateForm({ baseCategory, gameId }: LobbyCreateFormProps) 
           <input
             className="mt-0.5 size-4 shrink-0 accent-primary"
             name="activitySelectionMode"
+            onChange={() => setSelectionMode("ONLY_SELECTED")}
             type="radio"
             value="ONLY_SELECTED"
           />
           <span>
             <span className="block font-medium">Only selected offline games</span>
             <span className="mt-1 block leading-5 text-muted-foreground">
-              Use this for an evening with only card games, only board games,
-              only dice games, or your own combination.
+              Play the base game with only the offline types you check below —
+              no random mixing from other categories.
             </span>
           </span>
         </label>
       </fieldset>
-      <fieldset className="space-y-2 rounded-lg border border-border p-3">
-        <legend className="px-1 text-sm font-medium">Available tonight</legend>
+      <fieldset
+        className={`space-y-2 rounded-lg border p-3 transition-colors ${
+          onlySelectedButEmpty ? "border-destructive" : "border-border"
+        }`}
+      >
+        <legend className="px-1 text-sm font-medium">
+          Available tonight
+          {selectionMode === "ONLY_SELECTED" ? (
+            <span className="ml-1 text-destructive">*</span>
+          ) : null}
+        </legend>
         <p className="text-xs leading-5 text-muted-foreground">
-          Check only the equipment and game types your group can actually use.
+          {selectionMode === "ONLY_SELECTED"
+            ? "Required in this mode — check at least one type your group can play."
+            : "Check only the equipment and game types your group can actually use."}
         </p>
         <div className="space-y-2">
           {GAME_ACTIVITY_KINDS.map((activityKind) => (
@@ -117,8 +148,10 @@ export function LobbyCreateForm({ baseCategory, gameId }: LobbyCreateFormProps) 
               key={activityKind}
             >
               <input
+                checked={checkedKinds.has(activityKind)}
                 className="size-4 shrink-0 accent-primary"
                 name="activityKinds"
+                onChange={(e) => toggleKind(activityKind, e.target.checked)}
                 type="checkbox"
                 value={activityKind}
               />
@@ -126,13 +159,23 @@ export function LobbyCreateForm({ baseCategory, gameId }: LobbyCreateFormProps) 
             </label>
           ))}
         </div>
+        {onlySelectedButEmpty ? (
+          <p className="text-xs text-destructive">
+            Choose at least one offline game type.
+          </p>
+        ) : null}
       </fieldset>
       {state.message ? (
         <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
           {state.message}
         </p>
       ) : null}
-      <Button className="w-full" disabled={pending} size="lg" type="submit">
+      <Button
+        className="w-full"
+        disabled={pending || onlySelectedButEmpty}
+        size="lg"
+        type="submit"
+      >
         <Gamepad2 className="size-4" />
         {pending ? "Creating lobby..." : "Create lobby"}
       </Button>
