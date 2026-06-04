@@ -59,6 +59,8 @@ export const GAME_ACTIVITY_KINDS = [
   "OTHER",
 ] as const;
 
+export const TIMER_BEHAVIORS = ["FIXED", "RANDOM_BOMB"] as const;
+
 export const LOBBY_ACTIVITY_SELECTION_MODES = ["MIXED", "ONLY_SELECTED"] as const;
 
 export const GAME_VOTE_TYPES = ["LIKE", "DISLIKE"] as const;
@@ -78,6 +80,7 @@ export type GameIntensity = (typeof GAME_INTENSITIES)[number];
 export type GameVisibility = (typeof GAME_VISIBILITIES)[number];
 export type GameCardType = (typeof GAME_CARD_TYPES)[number];
 export type GameActivityKind = (typeof GAME_ACTIVITY_KINDS)[number];
+export type TimerBehavior = (typeof TIMER_BEHAVIORS)[number];
 export type LobbyActivitySelectionMode =
   (typeof LOBBY_ACTIVITY_SELECTION_MODES)[number];
 export type GameVoteType = (typeof GAME_VOTE_TYPES)[number];
@@ -123,6 +126,9 @@ export interface GameCard {
   position: number;
   submitted_by_session_user_id: string | null;
   text: string;
+  timer_behavior: TimerBehavior;
+  timer_max_seconds: number | null;
+  timer_min_seconds: number | null;
   timer_seconds: number | null;
 }
 
