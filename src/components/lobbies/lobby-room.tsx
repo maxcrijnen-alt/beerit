@@ -16,7 +16,13 @@ import {
   Send,
   UsersRound,
 } from "lucide-react";
-import { type FormEvent, startTransition, useEffect, useState } from "react";
+import {
+  type FormEvent,
+  startTransition,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import {
   adjustBeeritsAction,
   controlLobbyAction,
@@ -26,6 +32,7 @@ import {
 } from "@/app/lobby/actions";
 import { CurrentGameCard } from "@/components/games/current-game-card";
 import { GameCardVoteButtons } from "@/components/games/game-card-vote-buttons";
+import { BombModeTimer } from "@/components/lobbies/bomb-mode-timer";
 import { PostGameActions } from "@/components/lobbies/post-game-actions";
 import { TimedEventTimer } from "@/components/lobbies/timed-event-timer";
 import { ResponsiblePlayNote } from "@/components/responsible-play-note";
@@ -75,6 +82,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
   const [onlineSessionIds, setOnlineSessionIds] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
   const [mutationMessage, setMutationMessage] = useState<string | null>(null);
+  const [explodedBombCardId, setExplodedBombCardId] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const lobbyQuery = useQuery({
     initialData: initialRoom.lobby,
@@ -95,8 +103,23 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
   const players = [...playersQuery.data].sort((a, b) => b.beerits - a.beerits);
   const messages = messagesQuery.data;
   const currentCard = initialRoom.cards[lobby.current_card_index] ?? null;
+  const currentCardId = currentCard?.id ?? null;
+  const isBombModeCard = currentCard?.timer_behavior === "RANDOM_BOMB";
+  const hasBombTimerRange = Boolean(
+    currentCard?.timer_min_seconds && currentCard.timer_max_seconds,
+  );
+  const quickScoreBeerits = currentCard ? Math.max(1, currentCard.beerits_value) : 1;
+  const canQuickScore =
+    !isBombModeCard || !hasBombTimerRange || explodedBombCardId === currentCardId;
   const isHost = lobby.host_session_user_id === viewer.id;
   const onlineSet = new Set(onlineSessionIds);
+
+  const handleBombExplodedChange = useCallback(
+    (exploded: boolean) => {
+      setExplodedBombCardId(exploded && currentCardId ? currentCardId : null);
+    },
+    [currentCardId],
+  );
 
   useEffect(() => {
     if (!supabase) {
@@ -358,7 +381,16 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
                 card={currentCard}
                 label={`Card ${lobby.current_card_index + 1} of ${initialRoom.cards.length}`}
               />
-              {currentCard.timer_seconds ? (
+              {currentCard.timer_behavior === "RANDOM_BOMB" &&
+              hasBombTimerRange ? (
+                <BombModeTimer
+                  isHost={isHost}
+                  key={`${currentCard.id}:bomb:${currentCard.timer_min_seconds}:${currentCard.timer_max_seconds}:${isHost}`}
+                  maxSeconds={currentCard.timer_max_seconds ?? 180}
+                  minSeconds={currentCard.timer_min_seconds ?? 20}
+                  onExplodedChange={handleBombExplodedChange}
+                />
+              ) : currentCard.timer_seconds ? (
                 <TimedEventTimer
                   key={`${currentCard.id}:${currentCard.timer_seconds}`}
                   seconds={currentCard.timer_seconds}
@@ -384,35 +416,25 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
           {isHost && currentCard ? (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Quick score and next</CardTitle>
+                <CardTitle className="text-base">
+                  {isBombModeCard ? "Who held it?" : "Quick score and next"}
+                </CardTitle>
                 <CardDescription>
-                  Tap the losing or selected player to add{" "}
-                  {currentCard.card_type === "TIMED_EVENT"
-                    ? 1
-                    : Math.max(1, currentCard.beerits_value)}{" "}
-                  Beerit
-                  {(currentCard.card_type === "TIMED_EVENT"
-                    ? 1
-                    : Math.max(1, currentCard.beerits_value)) === 1
-                    ? ""
-                    : "s"}{" "}
-                  and continue immediately. Use the scoreboard below for
-                  multi-place results.
+                  {isBombModeCard && !canQuickScore
+                    ? "Wait for BOOM, then tap the player holding it to add Beerits and continue."
+                    : `Tap the losing or selected player to add ${quickScoreBeerits} ${
+                        quickScoreBeerits === 1 ? "Beerit" : "Beerits"
+                      } and continue immediately. Use the scoreboard below for multi-place results.`}
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-2">
                 {players.map((player) => (
                   <Button
                     className="min-h-12"
-                    disabled={pending}
+                    disabled={pending || !canQuickScore}
                     key={player.id}
                     onClick={() =>
-                      scoreAndAdvance(
-                        player.id,
-                        currentCard.card_type === "TIMED_EVENT"
-                          ? 1
-                          : Math.max(1, currentCard.beerits_value),
-                      )
+                      scoreAndAdvance(player.id, quickScoreBeerits)
                     }
                     variant="secondary"
                   >
