@@ -2,6 +2,14 @@
 
 Use this checklist to merge the current Codex work without guessing branch order.
 
+## Recommended PR
+
+- `codex/release-candidate`
+  - Combined branch with all high-priority fixes, Bomb Mode backend/UI,
+    creator controls, CI, and planning docs.
+  - Passed `npm.cmd run lint` and `npm.cmd run build` after integration.
+  - This is the easiest branch to open as one PR into `main`.
+
 ## High Priority Branches
 
 1. `codex/milestone-13a-core-bugs`
@@ -19,6 +27,11 @@ Use this checklist to merge the current Codex work without guessing branch order
    - Adds the host-owned random Bomb Mode lobby timer.
    - If opening a PR before backend is merged, use `codex/bomb-mode-backend` as
      the base branch. After backend merges, retarget or rebase onto `main`.
+
+4. `codex/bomb-mode-creator-ui`
+   - Stacked on `codex/release-candidate`.
+   - Adds creator controls for fixed timers versus Bomb Mode random timers.
+   - Updates create, add-card, and remix flows to persist timer behavior fields.
 
 ## Supporting Branches
 
@@ -48,6 +61,8 @@ The following branches passed local checks before push:
 - `codex/milestone-13a-core-bugs`: `npm.cmd run lint`, `npm.cmd run build`
 - `codex/bomb-mode-backend`: `npm.cmd run lint`, `npm.cmd run build`
 - `codex/bomb-mode-ui`: `npm.cmd run lint`, `npm.cmd run build`
+- `codex/bomb-mode-creator-ui`: `npm.cmd run lint`, `npm.cmd run build`
+- `codex/release-candidate`: `npm.cmd run lint`, `npm.cmd run build`
 
 ## Product Safety Notes
 
