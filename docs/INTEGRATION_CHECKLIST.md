@@ -15,12 +15,12 @@ Use this checklist to merge the current Codex work without guessing branch order
 1. `codex/milestone-13a-core-bugs`
    - Fixes create/add-card validation cleanup.
    - Fixes offline-only physical game lobby card selection.
-   - Adds migration `20260603100000_fix_only_selected_base_cards.sql`.
+   - Adds migration `20260604220818_fix_only_selected_base_cards.sql`.
 
 2. `codex/bomb-mode-backend`
    - Adds Bomb Mode timer schema.
    - Adds Bomb Mode starter game and seed data.
-   - Adds migration `20260603120000_bomb_mode_timer_behavior.sql`.
+   - Adds migration `20260604220906_bomb_mode_timer_behavior.sql`.
 
 3. `codex/bomb-mode-ui`
    - Stacked on `codex/bomb-mode-backend`.
@@ -46,13 +46,13 @@ when convenient.
 
 ## Supabase Migration Order
 
-Apply migrations in timestamp order after the relevant branches land:
+Production Supabase project `hbtscxousunjthuesrwb` has these migrations applied:
 
-1. `20260603100000_fix_only_selected_base_cards.sql`
-2. `20260603120000_bomb_mode_timer_behavior.sql`
+1. `20260604220818_fix_only_selected_base_cards`
+2. `20260604220906_bomb_mode_timer_behavior`
 
-Do not apply migrations from an unreviewed branch unless you intentionally want
-production Supabase ahead of `main`.
+Keep local migration filenames aligned with these production versions so future
+CLI/CI deploys do not attempt to apply duplicate schema changes.
 
 ## Checks Already Run
 
