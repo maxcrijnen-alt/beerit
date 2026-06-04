@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Save, Trash2 } from "lucide-react";
 import { startTransition, useActionState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { addGameCardsAction } from "@/app/games/creator-actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,6 +61,37 @@ export function AddGameCardsForm({
     control: form.control,
     name: "cards",
   });
+  const watchedCards = useWatch({ control: form.control, name: "cards" });
+
+  function syncCardFieldsForType(index: number, cardType: GameCardType) {
+    const currentActivityKind = watchedCards?.[index]?.activityKind;
+    const currentTimerSeconds = watchedCards?.[index]?.timerSeconds;
+    const timerSeconds =
+      typeof currentTimerSeconds === "number" && Number.isFinite(currentTimerSeconds)
+        ? currentTimerSeconds
+        : 20;
+
+    form.setValue(`cards.${index}.cardType`, cardType, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    form.setValue(
+      `cards.${index}.activityKind`,
+      cardType === "ACTIVITY" ? currentActivityKind ?? "OTHER" : null,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+    form.setValue(
+      `cards.${index}.timerSeconds`,
+      cardType === "TIMED_EVENT" ? timerSeconds : null,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      },
+    );
+  }
 
   return (
     <form
@@ -121,7 +152,13 @@ export function AddGameCardsForm({
           </div>
         </CardContent>
       </Card>
-      {cards.fields.map((field, index) => (
+      {cards.fields.map((field, index) => {
+        const selectedCardType =
+          watchedCards?.[index]?.cardType ?? field.cardType;
+        const isActivityCard = selectedCardType === "ACTIVITY";
+        const isTimedEventCard = selectedCardType === "TIMED_EVENT";
+
+        return (
         <Card key={field.id}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-sm">New card {index + 1}</CardTitle>
@@ -153,7 +190,13 @@ export function AddGameCardsForm({
                 <Label htmlFor={`cards.${index}.cardType`}>Type</Label>
                 <Select
                   id={`cards.${index}.cardType`}
-                  {...form.register(`cards.${index}.cardType`)}
+                  {...form.register(`cards.${index}.cardType`, {
+                    onChange: (event) =>
+                      syncCardFieldsForType(
+                        index,
+                        event.target.value as GameCardType,
+                      ),
+                  })}
                 >
                   {GAME_CARD_TYPES.map((value) => (
                     <option key={value} value={value}>
@@ -178,6 +221,7 @@ export function AddGameCardsForm({
               <div className="space-y-2">
                 <Label htmlFor={`cards.${index}.activityKind`}>Activity</Label>
                 <Select
+                  disabled={!isActivityCard}
                   id={`cards.${index}.activityKind`}
                   {...form.register(`cards.${index}.activityKind`, {
                     setValueAs: (value) => value || null,
@@ -209,6 +253,7 @@ export function AddGameCardsForm({
               <div className="space-y-2">
                 <Label htmlFor={`cards.${index}.timerSeconds`}>Timer</Label>
                 <Input
+                  disabled={!isTimedEventCard}
                   id={`cards.${index}.timerSeconds`}
                   max={300}
                   min={5}
@@ -225,7 +270,8 @@ export function AddGameCardsForm({
             </div>
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
       {state.message ? (
         <p
           className={

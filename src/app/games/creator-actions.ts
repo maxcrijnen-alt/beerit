@@ -8,6 +8,7 @@ import { logDevelopmentError } from "@/lib/dev-log";
 import { createClient } from "@/lib/supabase/server";
 import {
   addGameCardsSchema,
+  normalizeGameCardsPayload,
   updateGameConceptSchema,
 } from "@/lib/validation/games";
 
@@ -39,7 +40,9 @@ export async function addGameCardsAction(
   _previousState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const parsed = addGameCardsSchema.safeParse(readPayload(formData));
+  const parsed = addGameCardsSchema.safeParse(
+    normalizeGameCardsPayload(readPayload(formData)),
+  );
 
   if (!parsed.success) {
     return {

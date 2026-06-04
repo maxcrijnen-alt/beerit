@@ -217,11 +217,13 @@ export function GameForm({
       </Card>
       <GameCardEditor
         append={cards.append}
+        control={form.control}
         errors={form.formState.errors}
         fields={cards.fields}
         move={cards.move}
         register={form.register}
         remove={cards.remove}
+        setValue={form.setValue}
       />
       {form.formState.errors.cards?.message ? (
         <p className="text-sm text-destructive">

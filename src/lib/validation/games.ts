@@ -92,3 +92,40 @@ export type GameFormValues = z.infer<typeof gameFormSchema>;
 export type CommunityGameCardValues = z.infer<typeof communityGameCardSchema>;
 export type NewGameCardsValues = z.infer<typeof newGameCardsSchema>;
 export type UpdateGameConceptValues = z.infer<typeof updateGameConceptSchema>;
+
+function normalizeGameCardPayload(card: unknown) {
+  if (!card || typeof card !== "object") {
+    return card;
+  }
+
+  const values = card as Record<string, unknown>;
+  const cardType = values.cardType;
+
+  return {
+    ...values,
+    activityKind: cardType === "ACTIVITY" ? values.activityKind || "OTHER" : null,
+    timerSeconds:
+      cardType === "TIMED_EVENT"
+        ? values.timerSeconds === "" || values.timerSeconds == null
+          ? 20
+          : values.timerSeconds
+        : null,
+  };
+}
+
+export function normalizeGameCardsPayload(payload: unknown) {
+  if (!payload || typeof payload !== "object") {
+    return payload;
+  }
+
+  const values = payload as Record<string, unknown>;
+
+  if (!Array.isArray(values.cards)) {
+    return payload;
+  }
+
+  return {
+    ...values,
+    cards: values.cards.map(normalizeGameCardPayload),
+  };
+}

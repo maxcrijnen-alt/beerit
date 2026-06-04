@@ -64,6 +64,12 @@ export async function createLobbyAction(
   });
 
   if (error || typeof data !== "string") {
+    if (error?.message.includes("No cards match")) {
+      return lobbyError(
+        "No cards match those offline game types yet. Choose another type or use a mixed lobby.",
+      );
+    }
+
     return lobbyError("Could not create this lobby. Try another game.");
   }
 

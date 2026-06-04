@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 import type { ActionState } from "@/lib/auth/action-state";
 import { getViewer } from "@/lib/auth/viewer";
 import { createClient } from "@/lib/supabase/server";
-import { gameFormSchema } from "@/lib/validation/games";
+import {
+  gameFormSchema,
+  normalizeGameCardsPayload,
+} from "@/lib/validation/games";
 
 export async function createGameAction(
   _previousState: ActionState,
@@ -25,7 +28,7 @@ export async function createGameAction(
     return { message: "Could not read the game form.", status: "error" };
   }
 
-  const parsed = gameFormSchema.safeParse(payload);
+  const parsed = gameFormSchema.safeParse(normalizeGameCardsPayload(payload));
 
   if (!parsed.success) {
     return {
