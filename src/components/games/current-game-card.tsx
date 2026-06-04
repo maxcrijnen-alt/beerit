@@ -14,6 +14,11 @@ export function CurrentGameCard({
   card,
   label = `Card ${card.position}`,
 }: CurrentGameCardProps) {
+  const randomBombTimerLabel =
+    card.timer_min_seconds && card.timer_max_seconds
+      ? `${card.timer_min_seconds}-${card.timer_max_seconds}s bomb timer`
+      : "Random bomb timer";
+
   return (
     <Card>
       <CardHeader>
@@ -24,6 +29,9 @@ export function CurrentGameCard({
             <Badge variant="outline">{card.activity_kind.replaceAll("_", " ")}</Badge>
           ) : null}
           {card.is_community ? <Badge variant="outline">Community</Badge> : null}
+          {card.timer_behavior === "RANDOM_BOMB" ? (
+            <Badge variant="outline">{randomBombTimerLabel}</Badge>
+          ) : null}
           {card.timer_seconds ? (
             <Badge variant="outline">{card.timer_seconds}s timer</Badge>
           ) : null}
