@@ -29,13 +29,13 @@ export function GameCard({ game }: GameCardProps) {
     : `${game.min_players}+`;
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">{game.category}</Badge>
           <Badge variant="outline">{game.intensity}</Badge>
         </div>
-        <CardTitle className="pt-1">{game.title}</CardTitle>
+        <CardTitle className="pt-1 text-xl">{game.title}</CardTitle>
         <CardDescription>{game.description}</CardDescription>
         {game.concept ? (
           <p className="text-xs text-primary">Concept: {game.concept}</p>
@@ -45,7 +45,7 @@ export function GameCard({ game }: GameCardProps) {
         </p>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
+        <div className="grid grid-cols-3 gap-2 rounded-2xl bg-secondary/60 p-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <UsersRound className="size-3.5 text-primary" />
             {playerRange}
@@ -59,7 +59,7 @@ export function GameCard({ game }: GameCardProps) {
             {game.plays_count}
           </span>
         </div>
-        <div className="flex gap-4 text-xs text-muted-foreground">
+        <div className="flex gap-4 px-1 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <Heart className="size-3.5" />
             {game.likes_count}

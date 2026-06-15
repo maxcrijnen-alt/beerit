@@ -13,7 +13,7 @@ export function ResponsiblePlayNote({
   return (
     <div
       className={cn(
-        "flex gap-3 rounded-xl border border-border bg-secondary/60 p-4 text-sm text-muted-foreground",
+        "flex gap-3 rounded-2xl border border-border/80 bg-secondary/70 p-4 text-sm text-muted-foreground shadow-sm",
         className,
       )}
     >

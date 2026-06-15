@@ -2,11 +2,12 @@
 @import "tw-animate-css";
 
 :root {
-  --background: oklch(0.985 0.004 95);
+  color-scheme: light;
+  --background: oklch(0.985 0.012 92);
   --foreground: oklch(0.19 0.015 75);
-  --card: oklch(1 0 0);
+  --card: oklch(0.998 0.004 92 / 92%);
   --card-foreground: oklch(0.19 0.015 75);
-  --popover: oklch(1 0 0);
+  --popover: oklch(0.998 0.004 92);
   --popover-foreground: oklch(0.19 0.015 75);
   --primary: oklch(0.67 0.18 48);
   --primary-foreground: oklch(0.99 0.01 95);
@@ -20,7 +21,10 @@
   --border: oklch(0.88 0.02 88);
   --input: oklch(0.88 0.02 88);
   --ring: oklch(0.67 0.18 48);
-  --radius: 0.75rem;
+  --glow-primary: oklch(0.76 0.16 50 / 24%);
+  --glow-secondary: oklch(0.84 0.08 86 / 35%);
+  --surface-wash: oklch(0.97 0.018 92 / 78%);
+  --radius: 1rem;
 }
 
 @theme inline {
@@ -52,9 +56,10 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    color-scheme: dark;
     --background: oklch(0.16 0.015 70);
     --foreground: oklch(0.97 0.01 90);
-    --card: oklch(0.21 0.018 70);
+    --card: oklch(0.21 0.018 70 / 86%);
     --card-foreground: oklch(0.97 0.01 90);
     --popover: oklch(0.21 0.018 70);
     --popover-foreground: oklch(0.97 0.01 90);
@@ -66,15 +71,30 @@
     --accent-foreground: oklch(0.97 0.01 90);
     --border: oklch(1 0 0 / 12%);
     --input: oklch(1 0 0 / 16%);
+    --glow-primary: oklch(0.67 0.18 48 / 18%);
+    --glow-secondary: oklch(0.47 0.08 78 / 18%);
+    --surface-wash: oklch(0.22 0.018 70 / 72%);
   }
 }
 
-body {
+html {
   background: var(--background);
+}
+
+body {
+  background:
+    radial-gradient(circle at 18% -12%, var(--glow-primary), transparent 32rem),
+    radial-gradient(circle at 100% 12%, var(--glow-secondary), transparent 28rem),
+    linear-gradient(180deg, var(--surface-wash), transparent 22rem),
+    var(--background);
   color: var(--foreground);
   min-height: 100dvh;
   overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: oklch(0.78 0.16 48 / 32%);
 }
 
 button,

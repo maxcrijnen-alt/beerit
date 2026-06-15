@@ -67,9 +67,12 @@ function BrowseLayout({
   }
 
   return (
-    <main className="min-h-screen bg-background px-4 py-6 text-foreground">
+    <main className="min-h-screen px-4 py-6 text-foreground">
       <div className="mx-auto max-w-xl space-y-5">
-        <Link className="font-semibold" href="/">
+        <Link
+          className="inline-flex items-center rounded-full bg-background/70 px-3 py-1.5 text-sm font-bold shadow-sm"
+          href="/"
+        >
           Beerit
         </Link>
         {children}
@@ -91,8 +94,10 @@ export default async function BrowsePage() {
 
   const content = (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Browse games</h1>
+      <div className="rounded-[1.5rem] border border-border/80 bg-card p-5 shadow-[0_16px_45px_rgba(48,34,18,0.08)]">
+        <h1 className="text-3xl font-semibold tracking-[-0.04em]">
+          Browse games
+        </h1>
         <p className="mt-1 text-sm leading-5 text-muted-foreground">
           Find a game for your group and start a lobby when you are ready.
         </p>

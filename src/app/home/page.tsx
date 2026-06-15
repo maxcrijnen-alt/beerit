@@ -31,46 +31,62 @@ export default async function HomePage() {
 
   return (
     <AppShell viewer={viewer}>
-      <section className="space-y-2">
-        <Badge variant={viewer.isAnonymous ? "secondary" : "outline"}>
-          {viewer.isAnonymous ? "Guest mode" : "Registered creator"}
-        </Badge>
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Ready to play, {name}?
-        </h1>
-        <p className="text-sm leading-6 text-muted-foreground">
-          Browse a game or enter a lobby code. Every play session runs through
-          a live lobby, including one-phone play.
-        </p>
-      </section>
-      <section className="mt-6 grid gap-3">
-        <Link
-          className={cn(buttonVariants({ size: "lg" }), "w-full")}
-          href="/browse?intent=random"
-        >
-          <Shuffle className="size-4" />
-          Pick random game
-          <ArrowRight className="ml-auto size-4" />
-        </Link>
-        <Link
-          className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full")}
-          href="/browse"
-        >
-          <Search className="size-4" />
-          Browse games
-        </Link>
-        <Link
-          className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full")}
-          href="/lobby"
-        >
-          <Gamepad2 className="size-4" />
-          Join a lobby
-        </Link>
+      <section className="relative overflow-hidden rounded-[2rem] border border-border/80 bg-card p-5 shadow-[0_20px_55px_rgba(48,34,18,0.10)]">
+        <div className="absolute -right-16 -top-20 size-44 rounded-full bg-primary/15 blur-3xl" />
+        <div className="absolute -bottom-24 left-6 size-40 rounded-full bg-accent/70 blur-3xl" />
+        <div className="relative space-y-3">
+          <Badge variant={viewer.isAnonymous ? "secondary" : "outline"}>
+            {viewer.isAnonymous ? "Guest mode" : "Registered creator"}
+          </Badge>
+          <div className="space-y-2">
+            <h1 className="text-4xl font-semibold tracking-[-0.04em]">
+              Ready to play, {name}?
+            </h1>
+            <p className="text-sm leading-6 text-muted-foreground">
+              Browse a game or enter a lobby code. Every play session runs
+              through a live lobby, including one-phone play.
+            </p>
+          </div>
+          <div className="grid gap-3 pt-2">
+            <Link
+              className={cn(buttonVariants({ size: "lg" }), "w-full")}
+              href="/browse?intent=random"
+            >
+              <Shuffle className="size-4" />
+              Pick random game
+              <ArrowRight className="ml-auto size-4" />
+            </Link>
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                className={cn(
+                  buttonVariants({ size: "lg", variant: "outline" }),
+                  "w-full",
+                )}
+                href="/browse"
+              >
+                <Search className="size-4" />
+                Browse
+              </Link>
+              <Link
+                className={cn(
+                  buttonVariants({ size: "lg", variant: "outline" }),
+                  "w-full",
+                )}
+                href="/lobby"
+              >
+                <Gamepad2 className="size-4" />
+                Lobby
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
       <section className="mt-6 grid gap-3 sm:grid-cols-2">
         <Card>
           <CardHeader>
-            <PlusCircle className="size-5 text-primary" />
+            <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <PlusCircle className="size-5" />
+            </span>
             <CardTitle>Create games</CardTitle>
             <CardDescription>
               Publish your own party game or remix a community favorite.
@@ -87,7 +103,9 @@ export default async function HomePage() {
         </Card>
         <Card>
           <CardHeader>
-            <UserRound className="size-5 text-primary" />
+            <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <UserRound className="size-5" />
+            </span>
             <CardTitle>Your profile</CardTitle>
             <CardDescription>
               {viewer.isAnonymous
@@ -106,7 +124,9 @@ export default async function HomePage() {
         </Card>
         <Card>
           <CardHeader>
-            <UsersRound className="size-5 text-primary" />
+            <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <UsersRound className="size-5" />
+            </span>
             <CardTitle>Friends</CardTitle>
             <CardDescription>
               {viewer.isAnonymous
@@ -126,7 +146,9 @@ export default async function HomePage() {
         {viewer.profile?.role === "ADMIN" ? (
           <Card>
             <CardHeader>
-              <ShieldAlert className="size-5 text-primary" />
+              <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <ShieldAlert className="size-5" />
+              </span>
               <CardTitle>Moderation</CardTitle>
               <CardDescription>
                 Review reports and hide unsafe community games.
