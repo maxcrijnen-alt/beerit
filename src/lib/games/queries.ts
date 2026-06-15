@@ -1,3 +1,4 @@
+import { withTimeout } from "@/lib/async/with-timeout";
 import { createClient } from "@/lib/supabase/server";
 import type {
   Game,
@@ -36,6 +37,8 @@ const DETAIL_SELECT = `
   game_cards(*)
 `;
 
+const GAME_QUERY_TIMEOUT_MS = 6000;
+
 function mapGameSummary(row: GameSummaryRow): GameSummary {
   return {
     ...row,
@@ -51,12 +54,16 @@ export async function fetchGames(): Promise<GameSummary[]> {
     return [];
   }
 
-  const { data, error } = await supabase
-    .from("games")
-    .select(SUMMARY_SELECT)
-    .eq("visibility", "PUBLIC")
-    .eq("is_hidden", false)
-    .order("created_at", { ascending: false });
+  const { data, error } = await withTimeout(
+    supabase
+      .from("games")
+      .select(SUMMARY_SELECT)
+      .eq("visibility", "PUBLIC")
+      .eq("is_hidden", false)
+      .order("created_at", { ascending: false }),
+    GAME_QUERY_TIMEOUT_MS,
+    "Game list lookup timed out.",
+  );
 
   if (error) {
     throw new Error(`Could not fetch games: ${error.message}`);
@@ -72,11 +79,11 @@ export async function fetchGameById(id: string): Promise<GameDetail | null> {
     return null;
   }
 
-  const { data, error } = await supabase
-    .from("games")
-    .select(DETAIL_SELECT)
-    .eq("id", id)
-    .maybeSingle();
+  const { data, error } = await withTimeout(
+    supabase.from("games").select(DETAIL_SELECT).eq("id", id).maybeSingle(),
+    GAME_QUERY_TIMEOUT_MS,
+    "Game lookup timed out.",
+  );
 
   if (error) {
     throw new Error(`Could not fetch game: ${error.message}`);
@@ -121,11 +128,15 @@ export async function fetchGamesByCreator(
     return [];
   }
 
-  const { data, error } = await supabase
-    .from("games")
-    .select(SUMMARY_SELECT)
-    .eq("creator_id", creatorId)
-    .order("created_at", { ascending: false });
+  const { data, error } = await withTimeout(
+    supabase
+      .from("games")
+      .select(SUMMARY_SELECT)
+      .eq("creator_id", creatorId)
+      .order("created_at", { ascending: false }),
+    GAME_QUERY_TIMEOUT_MS,
+    "Creator game list lookup timed out.",
+  );
 
   if (error) {
     throw new Error(`Could not fetch creator games: ${error.message}`);
