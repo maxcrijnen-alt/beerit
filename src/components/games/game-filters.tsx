@@ -4,27 +4,50 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { useGameFiltersStore } from "@/stores/game-filters";
+import {
+  type DiscoveryContentMode,
+  type GameSort,
+  useGameFiltersStore,
+} from "@/stores/game-filters";
 import { GAME_CATEGORIES, GAME_INTENSITIES } from "@/types/database";
+
+const discoveryPresets = [
+  { label: "Hot", pool: "HOT", sort: "trending" },
+  { label: "Top", pool: "TOP", sort: "top" },
+  { label: "Recent", pool: "RECENT", sort: "new" },
+  { label: "Liked", pool: "MOST_LIKED", sort: "liked" },
+  { label: "Surprise", pool: "SURPRISE", sort: "random" },
+] as const;
 
 export function GameFilters() {
   const {
     category,
+    clearRecentRandomGameIds,
+    contentMode,
+    durationMaxMinutes,
     intensity,
+    pool,
     players,
     query,
+    recentRandomGameIds,
     reset,
     setCategory,
+    setContentMode,
+    setDurationMaxMinutes,
     setIntensity,
     setPlayers,
+    setPool,
     setQuery,
     setSort,
     sort,
   } = useGameFiltersStore();
   const hasFilters =
     category !== "ALL" ||
+    contentMode !== "BOTH" ||
+    durationMaxMinutes !== null ||
     intensity !== "ALL" ||
     players !== null ||
+    pool !== "HOT" ||
     query.length > 0 ||
     sort !== "trending";
   const quickCategories = ["Card Games", "Board Games", "Dice Games"] as const;
@@ -44,15 +67,31 @@ export function GameFilters() {
           value={query}
         />
       </div>
+      <div className="flex flex-wrap gap-2">
+        {discoveryPresets.map((preset) => (
+          <Button
+            key={preset.pool}
+            onClick={() => {
+              setPool(preset.pool);
+              setSort(preset.sort);
+            }}
+            size="sm"
+            variant={pool === preset.pool ? "secondary" : "outline"}
+          >
+            {preset.label}
+          </Button>
+        ))}
+      </div>
       <div className="grid grid-cols-2 gap-2">
         <Select
           aria-label="Sort games"
           onChange={(event) =>
-            setSort(event.target.value as "liked" | "new" | "random" | "trending")
+            setSort(event.target.value as GameSort)
           }
           value={sort}
         >
           <option value="trending">Trending</option>
+          <option value="top">Top</option>
           <option value="liked">Most liked</option>
           <option value="new">New</option>
           <option value="random">Random</option>
@@ -68,6 +107,35 @@ export function GameFilters() {
           {[2, 3, 4, 5, 6, 8, 10].map((value) => (
             <option key={value} value={value}>
               {value} players
+            </option>
+          ))}
+        </Select>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <Select
+          aria-label="Filter by content mode"
+          onChange={(event) =>
+            setContentMode(event.target.value as DiscoveryContentMode)
+          }
+          value={contentMode}
+        >
+          <option value="BOTH">Prompts + physical</option>
+          <option value="DIGITAL">Prompt games only</option>
+          <option value="PHYSICAL">Physical games only</option>
+        </Select>
+        <Select
+          aria-label="Filter by duration"
+          onChange={(event) =>
+            setDurationMaxMinutes(
+              event.target.value ? Number(event.target.value) : null,
+            )
+          }
+          value={durationMaxMinutes ?? ""}
+        >
+          <option value="">Any duration</option>
+          {[15, 30, 45, 60].map((value) => (
+            <option key={value} value={value}>
+              Up to {value} min
             </option>
           ))}
         </Select>
@@ -122,6 +190,16 @@ export function GameFilters() {
         <Button className="w-full" onClick={reset} size="sm" variant="ghost">
           <X className="size-3.5" />
           Clear filters
+        </Button>
+      ) : null}
+      {recentRandomGameIds.length > 0 ? (
+        <Button
+          className="w-full"
+          onClick={clearRecentRandomGameIds}
+          size="sm"
+          variant="ghost"
+        >
+          Reset recent random picks
         </Button>
       ) : null}
     </div>

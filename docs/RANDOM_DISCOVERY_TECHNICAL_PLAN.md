@@ -212,6 +212,15 @@ For MVP, route to game detail or lobby-create page. Do not auto-start gameplay.
 
 ## Implementation Milestones
 
+### Completed In `codex/random-discovery-client`
+
+- Added client filter state for discovery pool, content mode, duration cap, and
+  recent random game IDs.
+- Added browse presets for Hot, Top, Recent, Most liked, and Surprise.
+- Added physical/prompt and duration filters.
+- Added a lobby-first random pick CTA that routes to `/lobby/create/[gameId]`
+  and avoids recent picks on the same device where possible.
+
 ### 14.1 Client Filter Store
 
 - Extend `src/stores/game-filters.ts`.
