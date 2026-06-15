@@ -4,6 +4,7 @@ import {
   PlusCircle,
   Search,
   ShieldAlert,
+  Shuffle,
   UsersRound,
   UserRound,
 } from "lucide-react";
@@ -43,10 +44,20 @@ export default async function HomePage() {
         </p>
       </section>
       <section className="mt-6 grid gap-3">
-        <Link className={cn(buttonVariants({ size: "lg" }), "w-full")} href="/browse">
+        <Link
+          className={cn(buttonVariants({ size: "lg" }), "w-full")}
+          href="/browse?intent=random"
+        >
+          <Shuffle className="size-4" />
+          Pick random game
+          <ArrowRight className="ml-auto size-4" />
+        </Link>
+        <Link
+          className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full")}
+          href="/browse"
+        >
           <Search className="size-4" />
           Browse games
-          <ArrowRight className="ml-auto size-4" />
         </Link>
         <Link
           className={cn(buttonVariants({ size: "lg", variant: "outline" }), "w-full")}

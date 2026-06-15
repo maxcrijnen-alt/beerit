@@ -1,8 +1,8 @@
 "use client";
 
 import { SearchX, Shuffle } from "lucide-react";
-import { useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AdPlaceholder } from "@/components/ad-placeholder";
 import { EmptyState } from "@/components/empty-state";
 import { GameCard } from "@/components/games/game-card";
@@ -54,6 +54,8 @@ function weightedRandomOrder(games: GameSummary[], pool: DiscoveryPool) {
 
 export function GameBrowser({ games }: GameBrowserProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const hasAppliedRandomIntent = useRef(false);
   const {
     addRecentRandomGameId,
     category,
@@ -65,8 +67,23 @@ export function GameBrowser({ games }: GameBrowserProps) {
     query,
     randomSeed,
     recentRandomGameIds,
+    setPool,
+    setSort,
     sort,
   } = useGameFiltersStore();
+  useEffect(() => {
+    if (
+      hasAppliedRandomIntent.current ||
+      searchParams.get("intent") !== "random"
+    ) {
+      return;
+    }
+
+    hasAppliedRandomIntent.current = true;
+    setPool("SURPRISE");
+    setSort("random");
+  }, [searchParams, setPool, setSort]);
+
   const visibleGames = useMemo(() => {
     // A new seed intentionally recalculates the weighted random ordering.
     void randomSeed;
