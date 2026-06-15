@@ -20,11 +20,14 @@ export function AppShell({ children, viewer }: AppShellProps) {
     : "/settings";
 
   return (
-    <div className="min-h-dvh bg-background pb-[calc(5rem+env(safe-area-inset-bottom))] text-foreground">
-      <header className="sticky top-0 z-10 border-b border-border bg-background/95 pt-[env(safe-area-inset-top)] shadow-sm backdrop-blur">
+    <div className="min-h-dvh pb-[calc(6rem+env(safe-area-inset-bottom))] text-foreground">
+      <header className="sticky top-0 z-10 border-b border-border/70 bg-background/80 pt-[env(safe-area-inset-top)] shadow-[0_10px_30px_rgba(48,34,18,0.06)] backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-xl items-center justify-between px-4">
-          <Link className="flex items-center gap-2 font-semibold" href="/home">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <Link
+            className="flex items-center gap-2 text-[15px] font-bold tracking-tight"
+            href="/home"
+          >
+            <span className="flex size-9 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-[0_10px_24px_rgba(194,102,31,0.28)] ring-1 ring-white/30">
               <Beer className="size-4" />
             </span>
             Beerit
@@ -45,7 +48,9 @@ export function AppShell({ children, viewer }: AppShellProps) {
           </div>
         </div>
       </header>
-      <main className="app-page mx-auto w-full max-w-xl px-4 py-5">{children}</main>
+      <main className="app-page mx-auto w-full max-w-xl px-4 py-6">
+        {children}
+      </main>
       <BottomNav profileHref={profileHref} />
     </div>
   );

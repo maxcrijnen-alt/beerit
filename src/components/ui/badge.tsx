@@ -3,7 +3,7 @@ import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold",
+  "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold shadow-sm",
   {
     defaultVariants: {
       variant: "default",
@@ -11,7 +11,7 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: "border-transparent bg-primary text-primary-foreground",
-        outline: "border-border text-foreground",
+        outline: "border-border bg-background/60 text-foreground",
         secondary: "border-transparent bg-secondary text-secondary-foreground",
       },
     },

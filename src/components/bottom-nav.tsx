@@ -30,8 +30,8 @@ export function BottomNav({ profileHref }: BottomNavProps) {
   ];
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgba(0,0,0,0.06)] backdrop-blur">
-      <div className="mx-auto grid max-w-xl grid-cols-5">
+    <nav className="fixed inset-x-0 bottom-3 z-20 px-3 pb-[env(safe-area-inset-bottom)]">
+      <div className="mx-auto grid max-w-xl grid-cols-5 rounded-[1.35rem] border border-border/80 bg-background/85 p-1 shadow-[0_18px_48px_rgba(48,34,18,0.16)] backdrop-blur-xl">
         {navItems.map(({ href, icon: Icon, label }) => {
           const active =
             pathname === href || (href !== "/home" && pathname.startsWith(href));
@@ -39,8 +39,8 @@ export function BottomNav({ profileHref }: BottomNavProps) {
           return (
             <Link
               className={cn(
-                "relative flex min-h-16 touch-manipulation flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted-foreground transition-[color,transform] duration-150 active:scale-95",
-                active && "text-primary after:absolute after:top-1 after:h-1 after:w-6 after:rounded-full after:bg-primary",
+                "relative flex min-h-14 touch-manipulation flex-col items-center justify-center gap-1 rounded-[1rem] text-[11px] font-semibold text-muted-foreground transition-[background-color,color,transform] duration-150 active:scale-95",
+                active && "bg-primary/10 text-primary",
               )}
               href={href}
               key={label}

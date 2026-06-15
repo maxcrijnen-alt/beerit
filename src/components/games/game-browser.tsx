@@ -255,32 +255,43 @@ export function GameBrowser({ games }: GameBrowserProps) {
   return (
     <div className="space-y-4">
       <GameFilters />
-      <section className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm">
-        <div className="space-y-1">
-          <h2 className="font-semibold">Pick a random lobby</h2>
-          <p className="text-sm leading-5 text-muted-foreground">
-            Uses your filters, avoids recent picks on this device, and still
-            sends everyone through lobby setup. No stakes or rewards involved.
-          </p>
+      <section className="relative overflow-hidden rounded-[1.5rem] border border-border/80 bg-card p-4 shadow-[0_16px_45px_rgba(48,34,18,0.08)]">
+        <div className="absolute -right-12 -top-14 size-36 rounded-full bg-primary/15 blur-3xl" />
+        <div className="relative space-y-3">
+          <div className="space-y-1">
+            <h2 className="flex items-center gap-2 font-semibold">
+              <span className="flex size-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Shuffle className="size-4" />
+              </span>
+              Pick a random lobby
+            </h2>
+            <p className="text-sm leading-5 text-muted-foreground">
+              Uses your filters, avoids recent picks on this device, and still
+              sends everyone through lobby setup. No stakes or rewards involved.
+            </p>
+          </div>
+          <Button
+            className="w-full"
+            disabled={visibleGames.length === 0 || isPickingRandom}
+            onClick={handlePickRandom}
+          >
+            <Shuffle className="size-4" />
+            {isPickingRandom ? "Picking..." : "Pick random game"}
+          </Button>
+          {randomMessage ? (
+            <p
+              aria-live="polite"
+              className="text-xs leading-5 text-muted-foreground"
+            >
+              {randomMessage}
+            </p>
+          ) : null}
+          {freshRandomGames.length === 0 && visibleGames.length > 0 ? (
+            <p className="text-xs leading-5 text-muted-foreground">
+              All matching games were picked recently, so Beerit may reuse one.
+            </p>
+          ) : null}
         </div>
-        <Button
-          className="w-full"
-          disabled={visibleGames.length === 0 || isPickingRandom}
-          onClick={handlePickRandom}
-        >
-          <Shuffle className="size-4" />
-          {isPickingRandom ? "Picking..." : "Pick random game"}
-        </Button>
-        {randomMessage ? (
-          <p aria-live="polite" className="text-xs leading-5 text-muted-foreground">
-            {randomMessage}
-          </p>
-        ) : null}
-        {freshRandomGames.length === 0 && visibleGames.length > 0 ? (
-          <p className="text-xs leading-5 text-muted-foreground">
-            All matching games were picked recently, so Beerit may reuse one.
-          </p>
-        ) : null}
       </section>
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold">

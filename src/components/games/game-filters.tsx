@@ -53,10 +53,19 @@ export function GameFilters() {
   const quickCategories = ["Card Games", "Board Games", "Dice Games"] as const;
 
   return (
-    <div className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm">
-      <div className="flex items-center gap-2 text-sm font-semibold">
-        <SlidersHorizontal className="size-4 text-primary" />
-        Find a game
+    <div className="space-y-3 rounded-2xl border border-border/80 bg-card p-4 shadow-[0_14px_40px_rgba(48,34,18,0.07)] backdrop-blur">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <span className="flex size-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <SlidersHorizontal className="size-4" />
+          </span>
+          Find a game
+        </div>
+        {hasFilters ? (
+          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
+            Filtered
+          </span>
+        ) : null}
       </div>
       <div className="relative">
         <Search className="pointer-events-none absolute left-3 top-3.5 size-4 text-muted-foreground" />
