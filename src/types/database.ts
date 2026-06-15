@@ -75,6 +75,16 @@ export const GAME_REPORT_REASONS = [
   "OTHER",
 ] as const;
 
+export const DISCOVERY_CONTENT_MODES = ["BOTH", "DIGITAL", "PHYSICAL"] as const;
+
+export const DISCOVERY_POOLS = [
+  "HOT",
+  "TOP",
+  "RECENT",
+  "MOST_LIKED",
+  "SURPRISE",
+] as const;
+
 export type GameCategory = (typeof GAME_CATEGORIES)[number];
 export type GameIntensity = (typeof GAME_INTENSITIES)[number];
 export type GameVisibility = (typeof GAME_VISIBILITIES)[number];
@@ -85,6 +95,8 @@ export type LobbyActivitySelectionMode =
   (typeof LOBBY_ACTIVITY_SELECTION_MODES)[number];
 export type GameVoteType = (typeof GAME_VOTE_TYPES)[number];
 export type GameReportReason = (typeof GAME_REPORT_REASONS)[number];
+export type DiscoveryContentMode = (typeof DISCOVERY_CONTENT_MODES)[number];
+export type DiscoveryPool = (typeof DISCOVERY_POOLS)[number];
 
 export interface Game {
   category: GameCategory;

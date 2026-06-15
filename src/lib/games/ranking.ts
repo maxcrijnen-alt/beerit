@@ -1,13 +1,6 @@
-import type { GameSummary } from "@/types/database";
+import type { DiscoveryPool, GameSummary } from "@/types/database";
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
-
-export type DiscoveryPool =
-  | "HOT"
-  | "TOP"
-  | "RECENT"
-  | "MOST_LIKED"
-  | "SURPRISE";
 
 export function calculateGameScore(
   game: Pick<

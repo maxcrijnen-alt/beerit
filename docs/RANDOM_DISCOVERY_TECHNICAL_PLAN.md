@@ -221,6 +221,16 @@ For MVP, route to game detail or lobby-create page. Do not auto-start gameplay.
 - Added a lobby-first random pick CTA that routes to `/lobby/create/[gameId]`
   and avoids recent picks on the same device where possible.
 
+### Completed In `codex/random-pick-rpc`
+
+- Added `public.pick_random_game` as a Supabase RPC for server-side weighted
+  random selection.
+- The RPC filters to public, visible games only and supports category,
+  intensity, player count, duration, content mode, discovery pool, recent
+  exclusions, and search query.
+- The browse random CTA now tries the server-side RPC first and falls back to
+  the client picker if the RPC is unavailable.
+
 ### 14.1 Client Filter Store
 
 - Extend `src/stores/game-filters.ts`.

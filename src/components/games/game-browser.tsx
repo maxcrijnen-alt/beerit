@@ -1,8 +1,16 @@
 "use client";
 
 import { SearchX, Shuffle } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { pickRandomGameAction } from "@/app/browse/actions";
 import { AdPlaceholder } from "@/components/ad-placeholder";
 import { EmptyState } from "@/components/empty-state";
 import { GameCard } from "@/components/games/game-card";
@@ -11,11 +19,11 @@ import { Button } from "@/components/ui/button";
 import {
   calculateGameScore,
   calculateTrendingScore,
-  type DiscoveryPool,
   pickWeightedRandomGame,
 } from "@/lib/games/ranking";
+import { logDevelopmentError } from "@/lib/dev-log";
 import { useGameFiltersStore } from "@/stores/game-filters";
-import type { GameCategory, GameSummary } from "@/types/database";
+import type { DiscoveryPool, GameCategory, GameSummary } from "@/types/database";
 
 interface GameBrowserProps {
   games: GameSummary[];
@@ -56,6 +64,8 @@ export function GameBrowser({ games }: GameBrowserProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const hasAppliedRandomIntent = useRef(false);
+  const [isPickingRandom, setIsPickingRandom] = useState(false);
+  const [randomMessage, setRandomMessage] = useState<string | null>(null);
   const {
     addRecentRandomGameId,
     category,
@@ -152,24 +162,74 @@ export function GameBrowser({ games }: GameBrowserProps) {
       visibleGames.filter((game) => !recentRandomGameIds.includes(game.id)),
     [recentRandomGameIds, visibleGames],
   );
-  const handlePickRandom = useCallback(() => {
+  const pickLocalRandomGame = useCallback(() => {
     const candidates =
       freshRandomGames.length > 0 ? freshRandomGames : visibleGames;
-    const picked = pickWeightedRandomGame(candidates, pool);
 
-    if (!picked) {
-      return;
-    }
+    return pickWeightedRandomGame(candidates, pool);
+  }, [freshRandomGames, pool, visibleGames]);
+  const handlePickRandom = useCallback(() => {
+    setIsPickingRandom(true);
+    setRandomMessage(null);
 
-    addRecentRandomGameId(picked.id);
-    router.push(`/lobby/create/${picked.id}`);
+    startTransition(async () => {
+      try {
+        const result = await pickRandomGameAction({
+          category,
+          contentMode,
+          durationMaxMinutes,
+          intensity,
+          players,
+          pool,
+          query,
+          recentRandomGameIds,
+        });
+
+        if (result.status === "success" && result.gameId) {
+          addRecentRandomGameId(result.gameId);
+          router.push(`/lobby/create/${result.gameId}`);
+          return;
+        }
+
+        const picked = pickLocalRandomGame();
+
+        if (!picked) {
+          setRandomMessage(result.message);
+          return;
+        }
+
+        addRecentRandomGameId(picked.id);
+        setRandomMessage(result.message);
+        router.push(`/lobby/create/${picked.id}`);
+      } catch (error) {
+        logDevelopmentError("Could not pick a random game.", error);
+        const picked = pickLocalRandomGame();
+
+        if (!picked) {
+          setRandomMessage("Could not pick a random game. Try fewer filters.");
+          return;
+        }
+
+        addRecentRandomGameId(picked.id);
+        router.push(`/lobby/create/${picked.id}`);
+      } finally {
+        setIsPickingRandom(false);
+      }
+    });
   }, [
     addRecentRandomGameId,
-    freshRandomGames,
+    category,
+    contentMode,
+    durationMaxMinutes,
+    intensity,
+    pickLocalRandomGame,
+    players,
     pool,
+    query,
+    recentRandomGameIds,
     router,
-    visibleGames,
   ]);
+
 
   return (
     <div className="space-y-4">
@@ -184,12 +244,17 @@ export function GameBrowser({ games }: GameBrowserProps) {
         </div>
         <Button
           className="w-full"
-          disabled={visibleGames.length === 0}
+          disabled={visibleGames.length === 0 || isPickingRandom}
           onClick={handlePickRandom}
         >
           <Shuffle className="size-4" />
-          Pick random game
+          {isPickingRandom ? "Picking..." : "Pick random game"}
         </Button>
+        {randomMessage ? (
+          <p aria-live="polite" className="text-xs leading-5 text-muted-foreground">
+            {randomMessage}
+          </p>
+        ) : null}
         {freshRandomGames.length === 0 && visibleGames.length > 0 ? (
           <p className="text-xs leading-5 text-muted-foreground">
             All matching games were picked recently, so Beerit may reuse one.

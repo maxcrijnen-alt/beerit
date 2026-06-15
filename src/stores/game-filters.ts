@@ -2,10 +2,14 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { DiscoveryPool } from "@/lib/games/ranking";
-import type { GameCategory, GameIntensity } from "@/types/database";
+import type {
+  DiscoveryContentMode,
+  DiscoveryPool,
+  GameCategory,
+  GameIntensity,
+} from "@/types/database";
 
-export type DiscoveryContentMode = "BOTH" | "DIGITAL" | "PHYSICAL";
+export type { DiscoveryContentMode };
 export type GameSort = "liked" | "new" | "random" | "top" | "trending";
 
 const MAX_RECENT_RANDOM_GAMES = 12;
