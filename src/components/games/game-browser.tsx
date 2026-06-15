@@ -21,6 +21,7 @@ import {
   calculateTrendingScore,
   pickWeightedRandomGame,
 } from "@/lib/games/ranking";
+import { buildRandomLobbyCreateHref } from "@/lib/lobbies/defaults";
 import { logDevelopmentError } from "@/lib/dev-log";
 import { useGameFiltersStore } from "@/stores/game-filters";
 import type { DiscoveryPool, GameCategory, GameSummary } from "@/types/database";
@@ -168,6 +169,19 @@ export function GameBrowser({ games }: GameBrowserProps) {
 
     return pickWeightedRandomGame(candidates, pool);
   }, [freshRandomGames, pool, visibleGames]);
+  const pushRandomLobby = useCallback(
+    (game: Pick<GameSummary, "category" | "id">) => {
+      addRecentRandomGameId(game.id);
+      router.push(
+        buildRandomLobbyCreateHref({
+          categoryFilter: category,
+          contentMode,
+          game,
+        }),
+      );
+    },
+    [addRecentRandomGameId, category, contentMode, router],
+  );
   const handlePickRandom = useCallback(() => {
     setIsPickingRandom(true);
     setRandomMessage(null);
@@ -186,8 +200,15 @@ export function GameBrowser({ games }: GameBrowserProps) {
         });
 
         if (result.status === "success" && result.gameId) {
+          const pickedGame = games.find((game) => game.id === result.gameId);
+
+          if (pickedGame) {
+            pushRandomLobby(pickedGame);
+            return;
+          }
+
           addRecentRandomGameId(result.gameId);
-          router.push(`/lobby/create/${result.gameId}`);
+          router.push(`/lobby/create/${result.gameId}?fromRandom=1`);
           return;
         }
 
@@ -198,9 +219,8 @@ export function GameBrowser({ games }: GameBrowserProps) {
           return;
         }
 
-        addRecentRandomGameId(picked.id);
         setRandomMessage(result.message);
-        router.push(`/lobby/create/${picked.id}`);
+        pushRandomLobby(picked);
       } catch (error) {
         logDevelopmentError("Could not pick a random game.", error);
         const picked = pickLocalRandomGame();
@@ -210,8 +230,7 @@ export function GameBrowser({ games }: GameBrowserProps) {
           return;
         }
 
-        addRecentRandomGameId(picked.id);
-        router.push(`/lobby/create/${picked.id}`);
+        pushRandomLobby(picked);
       } finally {
         setIsPickingRandom(false);
       }
@@ -221,10 +240,12 @@ export function GameBrowser({ games }: GameBrowserProps) {
     category,
     contentMode,
     durationMaxMinutes,
+    games,
     intensity,
     pickLocalRandomGame,
     players,
     pool,
+    pushRandomLobby,
     query,
     recentRandomGameIds,
     router,

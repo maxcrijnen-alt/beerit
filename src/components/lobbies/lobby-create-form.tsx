@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { createLobbyAction } from "@/app/lobby/actions";
 import { Button } from "@/components/ui/button";
 import { INITIAL_ACTION_STATE } from "@/lib/auth/action-state";
+import type { LobbyCreateDefaults } from "@/lib/lobbies/defaults";
 import {
   GAME_ACTIVITY_KINDS,
   GAME_CATEGORIES,
@@ -14,6 +15,7 @@ import {
 
 interface LobbyCreateFormProps {
   baseCategory: GameCategory;
+  defaults?: LobbyCreateDefaults;
   gameId: string;
 }
 
@@ -24,18 +26,33 @@ const ACTIVITY_LABELS: Record<GameActivityKind, string> = {
   OTHER: "Other offline activities",
 };
 
-export function LobbyCreateForm({ baseCategory, gameId }: LobbyCreateFormProps) {
+export function LobbyCreateForm({
+  baseCategory,
+  defaults,
+  gameId,
+}: LobbyCreateFormProps) {
   const [state, action, pending] = useActionState(
     createLobbyAction,
     INITIAL_ACTION_STATE,
   );
+  const activitySelectionMode = defaults?.activitySelectionMode ?? "MIXED";
+  const activityKinds = defaults?.activityKinds ?? [];
+  const mixedCategories = defaults?.mixedCategories ?? [];
 
   return (
     <form action={action} className="space-y-3">
       <input name="gameId" type="hidden" value={gameId} />
+      {defaults?.source === "random" ? (
+        <p className="rounded-lg bg-secondary p-3 text-xs leading-5 text-muted-foreground">
+          Random picked this game from your filters. The lobby settings below
+          were prefilled, but you can still change them before creating the
+          room.
+        </p>
+      ) : null}
       <label className="flex items-start gap-3 rounded-lg border border-border p-3 text-sm">
         <input
           className="mt-0.5 size-5 shrink-0 accent-primary"
+          defaultChecked={defaults?.includeCommunityCards ?? false}
           name="includeCommunityCards"
           type="checkbox"
         />
@@ -61,6 +78,7 @@ export function LobbyCreateForm({ baseCategory, gameId }: LobbyCreateFormProps) 
               >
                 <input
                   className="size-4 shrink-0 accent-primary"
+                  defaultChecked={mixedCategories.includes(category)}
                   name="mixedCategories"
                   type="checkbox"
                   value={category}
@@ -75,7 +93,7 @@ export function LobbyCreateForm({ baseCategory, gameId }: LobbyCreateFormProps) 
         <legend className="px-1 text-sm font-medium">Offline game mode</legend>
         <label className="flex min-h-11 items-start gap-2 rounded-md py-1 text-xs">
           <input
-            defaultChecked
+            defaultChecked={activitySelectionMode === "MIXED"}
             className="mt-0.5 size-4 shrink-0 accent-primary"
             name="activitySelectionMode"
             type="radio"
@@ -92,6 +110,7 @@ export function LobbyCreateForm({ baseCategory, gameId }: LobbyCreateFormProps) 
         <label className="flex min-h-11 items-start gap-2 rounded-md py-1 text-xs">
           <input
             className="mt-0.5 size-4 shrink-0 accent-primary"
+            defaultChecked={activitySelectionMode === "ONLY_SELECTED"}
             name="activitySelectionMode"
             type="radio"
             value="ONLY_SELECTED"
@@ -118,6 +137,7 @@ export function LobbyCreateForm({ baseCategory, gameId }: LobbyCreateFormProps) 
             >
               <input
                 className="size-4 shrink-0 accent-primary"
+                defaultChecked={activityKinds.includes(activityKind)}
                 name="activityKinds"
                 type="checkbox"
                 value={activityKind}

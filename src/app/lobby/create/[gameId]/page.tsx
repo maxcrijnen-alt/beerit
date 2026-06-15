@@ -15,18 +15,24 @@ import {
 } from "@/components/ui/card";
 import { requireViewer } from "@/lib/auth/require-viewer";
 import { fetchGameById } from "@/lib/games/queries";
+import { getLobbyCreateDefaults } from "@/lib/lobbies/defaults";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 interface LobbyCreatePageProps {
   params: Promise<{ gameId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export default async function LobbyCreatePage({
   params,
+  searchParams,
 }: LobbyCreatePageProps) {
-  const { gameId } = await params;
+  const [{ gameId }, rawSearchParams] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const [viewer, game] = await Promise.all([
     requireViewer(),
     fetchGameById(gameId),
@@ -35,6 +41,8 @@ export default async function LobbyCreatePage({
   if (!game) {
     notFound();
   }
+
+  const lobbyDefaults = getLobbyCreateDefaults(rawSearchParams, game.category);
 
   return (
     <AppShell viewer={viewer}>
@@ -78,7 +86,11 @@ export default async function LobbyCreatePage({
                 Guests welcome
               </p>
             </div>
-            <LobbyCreateForm baseCategory={game.category} gameId={game.id} />
+            <LobbyCreateForm
+              baseCategory={game.category}
+              defaults={lobbyDefaults}
+              gameId={game.id}
+            />
           </CardContent>
         </Card>
         <ResponsiblePlayNote compact />

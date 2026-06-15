@@ -231,6 +231,14 @@ For MVP, route to game detail or lobby-create page. Do not auto-start gameplay.
 - The browse random CTA now tries the server-side RPC first and falls back to
   the client picker if the RPC is unavailable.
 
+### Completed In `codex/random-lobby-defaults`
+
+- Random picks now carry physical game preferences into lobby creation.
+- Card, board, and dice games prefill `Only selected offline games` with the
+  matching equipment type.
+- The lobby-create form explains that random defaults can still be changed
+  before creating the room.
+
 ### 14.1 Client Filter Store
 
 - Extend `src/stores/game-filters.ts`.
