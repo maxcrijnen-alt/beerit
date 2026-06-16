@@ -14,13 +14,13 @@ import {
   type JoinLobbyValues,
 } from "@/lib/validation/lobbies";
 
-export function LobbyJoinForm() {
+export function LobbyJoinForm({ initialCode = "" }: { initialCode?: string }) {
   const [state, action, pending] = useActionState(
     joinLobbyAction,
     INITIAL_ACTION_STATE,
   );
   const form = useForm<JoinLobbyValues>({
-    defaultValues: { code: "" },
+    defaultValues: { code: initialCode.toUpperCase() },
     resolver: zodResolver(joinLobbySchema),
   });
   const codeError =

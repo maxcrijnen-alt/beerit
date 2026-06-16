@@ -15,6 +15,7 @@ import {
   Plus,
   RotateCcw,
   Send,
+  Share2,
   UsersRound,
 } from "lucide-react";
 import {
@@ -79,6 +80,17 @@ type MutationFeedback = {
 };
 
 const REALTIME_TIMEOUT_MS = 6000;
+
+function getInitials(name: string) {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+
+  return initials || "?";
+}
 
 export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
   const queryClient = useQueryClient();
@@ -352,6 +364,35 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
     }
   }
 
+  async function shareLobby() {
+    const url = `${window.location.origin}/lobby?code=${lobby.code}`;
+    const text = `Join my Beerit lobby for ${initialRoom.game.title}. Code: ${lobby.code}`;
+
+    try {
+      if (typeof navigator.share === "function") {
+        await navigator.share({ text, title: "Join my Beerit lobby", url });
+        return;
+      }
+
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      setMutationFeedback({
+        message: "Invite link copied to clipboard.",
+        tone: "success",
+      });
+    } catch (error) {
+      // A cancelled native share rejects with AbortError; ignore it quietly.
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+
+      logDevelopmentError("Could not share the lobby.", error);
+      setMutationFeedback({
+        message: "Could not open the share sheet. Copy the code instead.",
+        tone: "error",
+      });
+    }
+  }
+
   return (
     <div className="space-y-4">
       <section className="flex items-start justify-between gap-3">
@@ -393,12 +434,65 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
           <CardHeader>
             <CardTitle>Waiting room</CardTitle>
             <CardDescription>
-              Share the lobby code. One-phone play can start immediately with
-              the host as the only connected device.
+              Invite the group with the code or a share link. One-phone play
+              can start right away with the host as the only connected device.
             </CardDescription>
           </CardHeader>
-          {isHost ? (
-            <CardContent>
+          <CardContent className="space-y-4">
+            <Button
+              className="w-full"
+              onClick={shareLobby}
+              type="button"
+              variant="outline"
+            >
+              <Share2 className="size-4" />
+              Share invite
+            </Button>
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground">
+                {players.length} {players.length === 1 ? "player" : "players"} in
+                the room
+              </p>
+              <ul className="space-y-2">
+                {players.map((player) => {
+                  const online = onlineSet.has(player.session_user_id);
+
+                  return (
+                    <li
+                      className="flex items-center gap-3 rounded-lg border border-border p-2.5"
+                      key={player.id}
+                    >
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold">
+                        {getInitials(player.display_name)}
+                      </span>
+                      <span className="flex min-w-0 flex-1 items-center gap-1 truncate text-sm font-medium">
+                        {player.is_host ? (
+                          <Crown className="size-3 shrink-0 text-primary" />
+                        ) : null}
+                        {player.display_name}
+                      </span>
+                      <span
+                        className={
+                          online
+                            ? "flex shrink-0 items-center gap-1.5 text-xs text-primary"
+                            : "flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground"
+                        }
+                      >
+                        <span
+                          className={
+                            online
+                              ? "size-2 rounded-full bg-primary"
+                              : "size-2 rounded-full bg-muted-foreground/40"
+                          }
+                        />
+                        {online ? "Online" : "Away"}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            {isHost ? (
               <Button
                 className="w-full"
                 disabled={pending}
@@ -408,14 +502,12 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
                 <Play className="size-4" />
                 Start game
               </Button>
-            </CardContent>
-          ) : (
-            <CardContent>
+            ) : (
               <p className="text-sm text-muted-foreground">
                 Waiting for the host to start the game.
               </p>
-            </CardContent>
-          )}
+            )}
+          </CardContent>
         </Card>
       ) : null}
 
@@ -610,7 +702,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         </section>
       ) : null}
 
-      {lobby.status !== "FINISHED" ? <Card>
+      {lobby.status === "ACTIVE" ? <Card>
         <CardHeader>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">

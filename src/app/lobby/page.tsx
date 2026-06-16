@@ -18,11 +18,17 @@ import { fetchViewerLobbies } from "@/lib/lobbies/queries";
 
 export const dynamic = "force-dynamic";
 
-export default async function LobbyPage() {
-  const [viewer, lobbies] = await Promise.all([
+interface LobbyPageProps {
+  searchParams: Promise<{ code?: string }>;
+}
+
+export default async function LobbyPage({ searchParams }: LobbyPageProps) {
+  const [{ code }, viewer, lobbies] = await Promise.all([
+    searchParams,
     requireViewer(),
     fetchViewerLobbies(),
   ]);
+  const initialCode = (code ?? "").slice(0, 6).toUpperCase();
 
   return (
     <AppShell viewer={viewer}>
@@ -42,11 +48,13 @@ export default async function LobbyPage() {
               <CardTitle>Join a lobby</CardTitle>
             </div>
             <CardDescription>
-              Guests and registered players can both join waiting rooms.
+              {initialCode
+                ? "A lobby code was shared with you and is ready below."
+                : "Guests and registered players can both join waiting rooms."}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <LobbyJoinForm />
+            <LobbyJoinForm initialCode={initialCode} />
           </CardContent>
         </Card>
         <section className="space-y-3">

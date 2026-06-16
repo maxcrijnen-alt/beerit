@@ -57,6 +57,14 @@ and host-phone-first. Tick each item; note anything that fails.
 - [ ] Status badge reads "Waiting room" / "Playing" / "Finished" (no raw
       enum).
 - [ ] Lobby code is easy to copy from the header.
+- [ ] Waiting room lists everyone in the room with initials and an
+      Online / Away indicator that updates as people join or leave.
+- [ ] "Share invite" opens the native share sheet (mobile) or copies the
+      invite link (desktop); the link is /lobby?code=XXXXXX.
+- [ ] Opening a shared /lobby?code=XXXXXX link prefills the join form and
+      shows the "code was shared with you" hint.
+- [ ] The scoreboard only appears once the game is Playing (it is not
+      duplicated in the waiting room).
 - [ ] Current card is the visual focus; quick result, navigation
       (Prev / Skip / Stop / Next), and scoreboard are clear.
 - [ ] Chat reads as secondary (muted title/background) below gameplay.
