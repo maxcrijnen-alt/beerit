@@ -29,7 +29,7 @@ import {
   fetchGameCardVoteStates,
   fetchGameSocialState,
 } from "@/lib/social/queries";
-import { cn } from "@/lib/utils";
+import { cn, toTitleCase } from "@/lib/utils";
 import type { GameSocialState } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -68,7 +68,7 @@ function GameDetailContent({
           <Badge variant="secondary">{game.category}</Badge>
           <Badge variant="outline">{game.intensity}</Badge>
           {game.visibility !== "PUBLIC" ? (
-            <Badge variant="outline">{game.visibility}</Badge>
+            <Badge variant="outline">{toTitleCase(game.visibility)}</Badge>
           ) : null}
           {game.concept ? (
             <Badge variant="outline">Concept: {game.concept}</Badge>
@@ -137,9 +137,10 @@ function GameDetailContent({
             "w-full",
           )}
           href={canRemix ? `/games/${game.id}/remix` : "/auth"}
+          title={canRemix ? undefined : "Create an account to remix this game"}
         >
           <Copy className="size-4" />
-          Remix game
+          {canRemix ? "Remix game" : "Remix (sign in)"}
         </Link>
         {canManage ? (
           <Link
