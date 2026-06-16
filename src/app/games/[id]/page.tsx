@@ -137,9 +137,10 @@ function GameDetailContent({
             "w-full",
           )}
           href={canRemix ? `/games/${game.id}/remix` : "/auth"}
+          title={canRemix ? undefined : "Create an account to remix this game"}
         >
           <Copy className="size-4" />
-          Remix game
+          {canRemix ? "Remix game" : "Remix (sign in)"}
         </Link>
         {canManage ? (
           <Link
