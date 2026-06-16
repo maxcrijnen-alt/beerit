@@ -37,7 +37,7 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
         {viewer?.isAnonymous ? (
           <p className="rounded-lg border border-border bg-card p-3 text-sm text-muted-foreground">
             You are currently playing as {viewer.guestName}. Create an account
-            to publish games and earn Tokens.
+            to publish games and earn fictional creator Tokens.
           </p>
         ) : null}
         <AuthPanel />

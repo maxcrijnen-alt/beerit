@@ -86,7 +86,7 @@ function ProfileContent({
         <CardContent>
           <p className="text-sm leading-5 text-muted-foreground">
             Tokens are non-transferable creator points with no real-world value.
-            A creator earns one Token when their game receives a like.
+            A creator earns one fictional Token when their game receives a like.
           </p>
         </CardContent>
       </Card>
