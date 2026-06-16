@@ -460,14 +460,12 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">
-                  {isBombModeCard ? "Who held it?" : "Quick score and next"}
+                  {isBombModeCard ? "Who held it?" : "Quick result"}
                 </CardTitle>
                 <CardDescription>
                   {isBombModeCard && !canQuickScore
-                    ? "Wait for BOOM, then tap the player holding it to add Beerits and continue."
-                    : `Tap the losing or selected player to add ${quickScoreBeerits} ${
-                        quickScoreBeerits === 1 ? "Beerit" : "Beerits"
-                      } and continue immediately. Use the scoreboard below for multi-place results.`}
+                    ? "Wait for BOOM, then tap the player who held it."
+                    : `Tap the player who loses this round (+${quickScoreBeerits} Beerit${quickScoreBeerits !== 1 ? "s" : ""}). Adjust individually below for multi-place results.`}
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-2">
@@ -491,34 +489,46 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
             <div className="grid grid-cols-4 gap-2">
               <Button
                 aria-label="Previous card"
+                className="flex-col gap-0.5 text-xs"
                 disabled={pending || lobby.current_card_index === 0}
                 onClick={() => runControl("PREVIOUS")}
+                size="sm"
                 variant="outline"
               >
                 <ArrowLeft className="size-4" />
+                Prev
               </Button>
               <Button
                 aria-label="Skip card"
+                className="flex-col gap-0.5 text-xs"
                 disabled={pending}
                 onClick={() => runControl("SKIP")}
+                size="sm"
                 variant="outline"
               >
                 <FastForward className="size-4" />
+                Skip
               </Button>
               <Button
                 aria-label="Stop the evening"
+                className="flex-col gap-0.5 text-xs"
                 disabled={pending}
                 onClick={() => runControl("END")}
+                size="sm"
                 variant="outline"
               >
                 <Flag className="size-4" />
+                Stop
               </Button>
               <Button
                 aria-label="Next card"
+                className="flex-col gap-0.5 text-xs"
                 disabled={pending}
                 onClick={() => runControl("NEXT")}
+                size="sm"
               >
                 <ArrowRight className="size-4" />
+                Next
               </Button>
             </div>
           ) : null}
@@ -538,13 +548,39 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
 
       {lobby.status === "FINISHED" ? (
         <section className="space-y-3">
-          <Card>
+          <Card className="border-primary/30 bg-accent/20">
             <CardHeader>
-              <CardTitle>Game finished</CardTitle>
+              <CardTitle>Evening summary</CardTitle>
               <CardDescription>
-                Final scoreboard. Beerits are fictional in-game penalty points.
+                {players[0]
+                  ? `${players[0].display_name} finishes with the fewest Beerits.`
+                  : "No scores recorded."}
               </CardDescription>
             </CardHeader>
+            <CardContent className="space-y-2">
+              {players.map((player, i) => (
+                <div
+                  className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
+                  key={player.id}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="shrink-0 w-5 text-center text-sm font-mono text-muted-foreground">
+                      {i + 1}.
+                    </span>
+                    <p className="truncate text-sm font-semibold">
+                      {player.display_name}
+                    </p>
+                    {i === 0 ? <Crown className="size-3 shrink-0 text-primary" /> : null}
+                  </div>
+                  <span className="shrink-0 font-mono text-sm font-semibold">
+                    {player.beerits} {player.beerits === 1 ? "Beerit" : "Beerits"}
+                  </span>
+                </div>
+              ))}
+              <p className="pt-1 text-xs text-muted-foreground leading-5">
+                Beerits zijn fictieve strafpunten. Geen schulden, geen geld, geen verrekening.
+              </p>
+            </CardContent>
           </Card>
           {isHost ? (
             <Button
@@ -558,10 +594,10 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
             </Button>
           ) : null}
           <div>
-            <h2 className="font-semibold">What would you like to do next?</h2>
+            <h2 className="font-semibold">Next up</h2>
             <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              Adding a question is optional. Continue immediately or suggest
-              something for a future lobby.
+              Rematch, choose another game, go home, or suggest a question for
+              a future lobby.
             </p>
           </div>
           <PostGameActions gameId={initialRoom.game.id} />
@@ -570,9 +606,12 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <UsersRound className="size-4 text-primary" />
-            <CardTitle>Scoreboard</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <UsersRound className="size-4 text-primary" />
+              <CardTitle>Scoreboard</CardTitle>
+            </div>
+            <span className="text-xs text-muted-foreground">Fictieve Beerits</span>
           </div>
         </CardHeader>
         <CardContent className="space-y-2">
