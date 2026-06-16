@@ -1,7 +1,7 @@
 "use client";
 
 import { Gamepad2 } from "lucide-react";
-import { useActionState } from "react";
+import { useState, useActionState } from "react";
 import { createLobbyAction } from "@/app/lobby/actions";
 import { Button } from "@/components/ui/button";
 import { INITIAL_ACTION_STATE } from "@/lib/auth/action-state";
@@ -35,9 +35,29 @@ export function LobbyCreateForm({
     createLobbyAction,
     INITIAL_ACTION_STATE,
   );
-  const activitySelectionMode = defaults?.activitySelectionMode ?? "MIXED";
-  const activityKinds = defaults?.activityKinds ?? [];
+  const [selectionMode, setSelectionMode] = useState(
+    defaults?.activitySelectionMode ?? "MIXED",
+  );
+  const [checkedKinds, setCheckedKinds] = useState<Set<GameActivityKind>>(
+    new Set(defaults?.activityKinds ?? []),
+  );
   const mixedCategories = defaults?.mixedCategories ?? [];
+  const onlySelectedWithNoKinds =
+    selectionMode === "ONLY_SELECTED" && checkedKinds.size === 0;
+
+  function toggleKind(kind: GameActivityKind) {
+    setCheckedKinds((prev) => {
+      const next = new Set(prev);
+
+      if (next.has(kind)) {
+        next.delete(kind);
+      } else {
+        next.add(kind);
+      }
+
+      return next;
+    });
+  }
 
   return (
     <form action={action} className="space-y-3">
@@ -93,9 +113,10 @@ export function LobbyCreateForm({
         <legend className="px-1 text-sm font-medium">Offline game mode</legend>
         <label className="flex min-h-11 items-start gap-2 rounded-md py-1 text-xs">
           <input
-            defaultChecked={activitySelectionMode === "MIXED"}
+            checked={selectionMode === "MIXED"}
             className="mt-0.5 size-4 shrink-0 accent-primary"
             name="activitySelectionMode"
+            onChange={() => setSelectionMode("MIXED")}
             type="radio"
             value="MIXED"
           />
@@ -109,9 +130,10 @@ export function LobbyCreateForm({
         </label>
         <label className="flex min-h-11 items-start gap-2 rounded-md py-1 text-xs">
           <input
+            checked={selectionMode === "ONLY_SELECTED"}
             className="mt-0.5 size-4 shrink-0 accent-primary"
-            defaultChecked={activitySelectionMode === "ONLY_SELECTED"}
             name="activitySelectionMode"
+            onChange={() => setSelectionMode("ONLY_SELECTED")}
             type="radio"
             value="ONLY_SELECTED"
           />
@@ -124,7 +146,9 @@ export function LobbyCreateForm({
           </span>
         </label>
       </fieldset>
-      <fieldset className="space-y-2 rounded-lg border border-border p-3">
+      <fieldset
+        className={`space-y-2 rounded-lg border p-3 ${onlySelectedWithNoKinds ? "border-destructive" : "border-border"}`}
+      >
         <legend className="px-1 text-sm font-medium">Available tonight</legend>
         <p className="text-xs leading-5 text-muted-foreground">
           Check only the equipment and game types your group can actually use.
@@ -136,9 +160,10 @@ export function LobbyCreateForm({
               key={activityKind}
             >
               <input
+                checked={checkedKinds.has(activityKind)}
                 className="size-4 shrink-0 accent-primary"
-                defaultChecked={activityKinds.includes(activityKind)}
                 name="activityKinds"
+                onChange={() => toggleKind(activityKind)}
                 type="checkbox"
                 value={activityKind}
               />
@@ -146,13 +171,24 @@ export function LobbyCreateForm({
             </label>
           ))}
         </div>
+        {onlySelectedWithNoKinds ? (
+          <p className="text-xs text-destructive">
+            Select at least one game type when using &ldquo;Only selected
+            offline games&rdquo;.
+          </p>
+        ) : null}
       </fieldset>
       {state.message ? (
         <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
           {state.message}
         </p>
       ) : null}
-      <Button className="w-full" disabled={pending} size="lg" type="submit">
+      <Button
+        className="w-full"
+        disabled={pending || onlySelectedWithNoKinds}
+        size="lg"
+        type="submit"
+      >
         <Gamepad2 className="size-4" />
         {pending ? "Creating lobby..." : "Create lobby"}
       </Button>

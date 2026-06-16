@@ -86,23 +86,26 @@ function ProfileContent({
         <CardContent>
           <p className="text-sm leading-5 text-muted-foreground">
             Tokens are non-transferable creator points with no real-world value.
-            A creator earns one Token when their game receives a like.
+            A creator earns one fictional Token when their game receives a like.
           </p>
         </CardContent>
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Badge placeholders</CardTitle>
+          <CardTitle>Achievements</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           {badgePlaceholders.map((badge) => (
             <span
-              className="rounded-full border border-border bg-secondary px-3 py-1 text-xs text-muted-foreground"
+              className="rounded-full border border-dashed border-border bg-secondary/50 px-3 py-1 text-xs text-muted-foreground/60"
               key={badge}
             >
               {badge}
             </span>
           ))}
+          <p className="mt-2 w-full text-xs text-muted-foreground">
+            Achievements are coming. Keep creating and playing.
+          </p>
         </CardContent>
       </Card>
       <section className="space-y-3">

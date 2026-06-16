@@ -12,6 +12,7 @@ import type {
   UseFormRegister,
   UseFormSetValue,
 } from "react-hook-form";
+import { toTitleCase } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -313,7 +314,7 @@ export function GameCardEditor({
                 >
                   {GAME_CARD_TYPES.map((value) => (
                     <option key={value} value={value}>
-                      {value.replaceAll("_", " ")}
+                      {toTitleCase(value)}
                     </option>
                   ))}
                 </Select>
@@ -343,7 +344,7 @@ export function GameCardEditor({
                   <option value="">Not an activity</option>
                   {GAME_ACTIVITY_KINDS.map((value) => (
                     <option key={value} value={value}>
-                      {value.replaceAll("_", " ")}
+                      {toTitleCase(value)}
                     </option>
                   ))}
                 </Select>

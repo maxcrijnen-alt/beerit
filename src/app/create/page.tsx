@@ -27,7 +27,7 @@ export default async function CreatePage() {
             <CardTitle>Create an account first</CardTitle>
             <CardDescription>
               Guests can play and vote, but only registered creators can
-              publish games and earn Tokens.
+              publish games and earn fictional creator Tokens.
             </CardDescription>
           </CardHeader>
           <CardContent>
