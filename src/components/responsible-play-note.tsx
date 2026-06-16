@@ -20,8 +20,8 @@ export function ResponsiblePlayNote({
       <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
       <p className="leading-5">
         {compact
-          ? "Beerits are fictional party points. Play responsibly."
-          : "Beerit is a party game platform. Beerits are fictional penalty points and do not require alcohol. Play responsibly and follow local laws."}
+          ? "Beerits are fictional in-game penalty points; no real money, debts, or settlement."
+          : "Beerit is a party game platform. Beerits are fictional penalty points with no real-world value. No money changes hands, no debts are created, and no settlement is required. Play responsibly and follow local laws."}
       </p>
     </div>
   );
