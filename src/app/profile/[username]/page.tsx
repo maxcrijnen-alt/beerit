@@ -113,10 +113,21 @@ function ProfileContent({
           <h2 className="font-semibold">Created games</h2>
           <p className="text-xs text-muted-foreground">
             {games.length === 0
-              ? "No visible games yet."
+              ? isOwnProfile
+                ? "You haven't published a game yet."
+                : "No visible games yet."
               : `${games.length} ${games.length === 1 ? "game" : "games"} available.`}
           </p>
         </div>
+        {games.length === 0 && isOwnProfile ? (
+          <Link
+            className={cn(buttonVariants({ variant: "secondary" }), "w-full")}
+            href="/create"
+          >
+            <Pencil className="size-4" />
+            Create your first game
+          </Link>
+        ) : null}
         {games.map((game) => (
           <GameCard game={game} key={game.id} />
         ))}
