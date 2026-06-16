@@ -2,7 +2,6 @@ import {
   Clock3,
   Copy,
   ExternalLink,
-  Flame,
   ListOrdered,
   Pencil,
   Play,
@@ -14,6 +13,7 @@ import { AppShell } from "@/components/app-shell";
 import { CommunityQuestionForm } from "@/components/games/community-question-form";
 import { CurrentGameCard } from "@/components/games/current-game-card";
 import { GameCardVoteButtons } from "@/components/games/game-card-vote-buttons";
+import { GameTopicCards } from "@/components/games/game-topic-cards";
 import { GameVoteButtons } from "@/components/games/game-vote-buttons";
 import { ResponsiblePlayNote } from "@/components/responsible-play-note";
 import { Badge } from "@/components/ui/badge";
@@ -180,50 +180,12 @@ function GameDetailContent({
           ) : null}
         </CardContent>
       </Card>
-      {game.topics.length ? (
-        <section className="space-y-2">
-          <div>
-            <h2 className="font-semibold">Topics</h2>
-            <p className="text-xs leading-5 text-muted-foreground">
-              Add new questions to a topic. Spicy topics stay opt-in for adult
-              groups.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {game.topics.map((topic) => (
-              <Badge
-                key={topic.id}
-                variant={topic.is_spicy ? "secondary" : "outline"}
-              >
-                {topic.is_spicy ? (
-                  <Flame className="mr-0.5 size-3 text-primary" />
-                ) : null}
-                {topic.title}
-              </Badge>
-            ))}
-          </div>
-        </section>
-      ) : null}
-      <section className="space-y-3">
-        <div>
-          <h2 className="font-semibold">Card preview</h2>
-          <p className="text-xs text-muted-foreground">
-            The lobby will play these in order.
-          </p>
-        </div>
-        {game.cards.map((card) => (
-          <div className="space-y-2" key={card.id}>
-            <CurrentGameCard card={card} />
-            <GameCardVoteButtons
-              canVote={canUseCommunityActions}
-              cardId={card.id}
-              dislikes={card.dislikes_count}
-              initialVote={cardVotes[card.id] ?? null}
-              likes={card.likes_count}
-            />
-          </div>
-        ))}
-      </section>
+      <GameTopicCards
+        canVote={canUseCommunityActions}
+        cards={game.cards}
+        cardVotes={cardVotes}
+        topics={game.topics}
+      />
       <CommunityQuestionForm
         canSubmit={canUseCommunityActions}
         gameId={game.id}
