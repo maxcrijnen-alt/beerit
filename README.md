@@ -301,13 +301,12 @@ Run before finalizing changes:
 ```bash
 npm run lint
 npm run build
+npm run smoke:routes
 ```
 
-Optional route smoke check after starting the app or deploying:
+Route smoke checks default to the live app. For a local or preview target:
 
 ```bash
-curl http://localhost:3000/api/health
-curl http://localhost:3000/
-curl http://localhost:3000/browse
-curl "http://localhost:3000/browse?intent=random"
+npm run smoke:routes -- http://localhost:3000
+npm run smoke:routes -- https://your-preview.vercel.app
 ```
