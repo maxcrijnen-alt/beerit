@@ -246,6 +246,8 @@ steps above are the direct setup path.
 - `/lobby/[id]` - waiting room, gameplay, scoreboard, presence, and chat
 - `/friends` - friend requests and shared fictional Beerits history
 - `/admin/moderation` - admin-only review queue for reports and dislikes
+- `/api/health` - deployment health JSON for smoke checks; it reports whether
+  public Supabase config is present without exposing secret values
 
 ## Deploy to Vercel
 
@@ -298,4 +300,13 @@ Run before finalizing changes:
 ```bash
 npm run lint
 npm run build
+```
+
+Optional route smoke check after starting the app or deploying:
+
+```bash
+curl http://localhost:3000/api/health
+curl http://localhost:3000/
+curl http://localhost:3000/browse
+curl "http://localhost:3000/browse?intent=random"
 ```
