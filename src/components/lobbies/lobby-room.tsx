@@ -527,7 +527,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         </section>
       ) : null}
 
-      <Card>
+      {lobby.status !== "FINISHED" ? <Card>
         <CardHeader>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -582,7 +582,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
             </div>
           ))}
         </CardContent>
-      </Card>
+      </Card> : null}
 
       <Card>
         <CardHeader>
