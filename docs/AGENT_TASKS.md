@@ -60,6 +60,10 @@ Avoid while Codex is actively editing:
 - `main`: production-ready baseline.
 - `chore/project-audit`: audit branch with no feature changes.
 - `codex/agent-qa-workflow`: Codex QA and coordination docs.
+- `codex/game-topics-schema`: Codex backend/schema branch for game topics,
+  card-topic links, and topic-aware community questions. Claude should avoid
+  Supabase migrations, `src/types/database.ts`, game social actions, game
+  queries, and community question form changes until this lands.
 
 If Claude starts Milestone 13A, use a branch such as:
 
@@ -139,10 +143,16 @@ Owner: split between Community Agent and Gameplay Agent.
 
 Technical direction:
 
+- Add topics per game so questions can be grouped into packs such as Football,
+  Spicy, Student House, Physical Games, and Quick Categories.
 - Keep cloud suggestions weighted and moderated.
+- Let guests suggest questions, including topic-linked questions, without
+  earning Tokens.
 - Add session-only lobby questions that do not save to the cloud.
 - Keep guest suggestions allowed but non-tokenized.
 - Keep reports reasoned; dislikes do not require a reason.
+- Keep Spicy topics opt-in for adult groups and out of default random flows
+  until explicit UX support is built.
 
 ## Review Checklist
 

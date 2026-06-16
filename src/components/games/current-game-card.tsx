@@ -29,6 +29,11 @@ export function CurrentGameCard({
             <Badge variant="outline">{card.activity_kind.replaceAll("_", " ")}</Badge>
           ) : null}
           {card.is_community ? <Badge variant="outline">Community</Badge> : null}
+          {card.topics?.map((topic) => (
+            <Badge key={topic.id} variant={topic.is_spicy ? "secondary" : "outline"}>
+              {topic.title}
+            </Badge>
+          ))}
           {card.timer_behavior === "RANDOM_BOMB" ? (
             <Badge variant="outline">{randomBombTimerLabel}</Badge>
           ) : null}

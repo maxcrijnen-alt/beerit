@@ -142,6 +142,22 @@ export interface GameCard {
   timer_max_seconds: number | null;
   timer_min_seconds: number | null;
   timer_seconds: number | null;
+  topics?: GameTopic[];
+}
+
+export interface GameTopic {
+  created_at: string;
+  created_by_session_user_id: string | null;
+  description: string | null;
+  game_id: string;
+  id: string;
+  is_default: boolean;
+  is_hidden: boolean;
+  is_spicy: boolean;
+  slug: string;
+  sort_order: number;
+  title: string;
+  updated_at: string;
 }
 
 export interface GameSummary extends Game {
@@ -153,6 +169,7 @@ export interface GameDetail extends GameSummary {
   cards: GameCard[];
   community_cards: GameCard[];
   remixed_from_title: string | null;
+  topics: GameTopic[];
 }
 
 export interface GameReport {

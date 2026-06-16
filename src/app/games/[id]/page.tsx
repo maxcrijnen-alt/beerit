@@ -178,6 +178,27 @@ function GameDetailContent({
           ) : null}
         </CardContent>
       </Card>
+      {game.topics.length ? (
+        <section className="space-y-2">
+          <div>
+            <h2 className="font-semibold">Topics</h2>
+            <p className="text-xs leading-5 text-muted-foreground">
+              Add new questions to a topic. Spicy topics stay opt-in for adult
+              groups.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {game.topics.map((topic) => (
+              <Badge
+                key={topic.id}
+                variant={topic.is_spicy ? "secondary" : "outline"}
+              >
+                {topic.title}
+              </Badge>
+            ))}
+          </div>
+        </section>
+      ) : null}
       <section className="space-y-3">
         <div>
           <h2 className="font-semibold">Card preview</h2>
@@ -198,7 +219,11 @@ function GameDetailContent({
           </div>
         ))}
       </section>
-      <CommunityQuestionForm canSubmit={canUseCommunityActions} gameId={game.id} />
+      <CommunityQuestionForm
+        canSubmit={canUseCommunityActions}
+        gameId={game.id}
+        topics={game.topics}
+      />
       <section className="space-y-3">
         <div>
           <h2 className="font-semibold">Community questions</h2>

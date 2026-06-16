@@ -23,22 +23,24 @@ import {
   communityGameCardSchema,
   type CommunityGameCardValues,
 } from "@/lib/validation/games";
-import { GAME_INTENSITIES } from "@/types/database";
+import { GAME_INTENSITIES, type GameTopic } from "@/types/database";
 
 interface CommunityQuestionFormProps {
   canSubmit: boolean;
   gameId: string;
+  topics?: GameTopic[];
 }
 
 export function CommunityQuestionForm({
   canSubmit,
   gameId,
+  topics = [],
 }: CommunityQuestionFormProps) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const form = useForm<CommunityGameCardValues>({
-    defaultValues: { gameId, intensity: "Funny", text: "" },
+    defaultValues: { gameId, intensity: "Funny", text: "", topicId: null },
     resolver: zodResolver(communityGameCardSchema),
   });
 
@@ -50,7 +52,12 @@ export function CommunityQuestionForm({
         const result = await submitCommunityGameCardAction(values);
 
         if (result.status === "success") {
-          form.reset({ gameId, intensity: values.intensity, text: "" });
+          form.reset({
+            gameId,
+            intensity: values.intensity,
+            text: "",
+            topicId: values.topicId ?? null,
+          });
           router.refresh();
         }
 
@@ -77,6 +84,25 @@ export function CommunityQuestionForm({
         {canSubmit ? (
           <form className="space-y-3" onSubmit={form.handleSubmit(handleSubmit)}>
             <input type="hidden" {...form.register("gameId")} />
+            {topics.length ? (
+              <div className="space-y-2">
+                <Label htmlFor="community-topic">Topic</Label>
+                <Select
+                  id="community-topic"
+                  {...form.register("topicId", {
+                    setValueAs: (value) => value || null,
+                  })}
+                >
+                  <option value="">No topic</option>
+                  {topics.map((topic) => (
+                    <option key={topic.id} value={topic.id}>
+                      {topic.title}
+                      {topic.is_spicy ? " (18+ opt-in)" : ""}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            ) : null}
             <div className="space-y-2">
               <Label htmlFor="community-question">Question</Label>
               <Textarea
