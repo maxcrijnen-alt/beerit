@@ -32,7 +32,7 @@ export function TimedEventTimer({ seconds }: TimedEventTimerProps) {
         <div>
           <p className="flex items-center gap-2 text-xs text-muted-foreground">
             <Timer className="size-4 text-primary" />
-            {remaining === 0 ? "Time is up" : "Rapid fire timer"}
+            {remaining === 0 ? "Time is up" : "Round timer"}
           </p>
           <p className="mt-1 font-mono text-3xl font-semibold">{remaining}s</p>
         </div>
