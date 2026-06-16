@@ -248,6 +248,7 @@ export function AuthPanel() {
         <CardContent>
           <div className="mb-5 grid grid-cols-2 rounded-lg bg-secondary p-1">
             <button
+              aria-pressed={mode === "login"}
               className={`rounded-md px-3 py-2 text-sm font-semibold transition ${
                 mode === "login"
                   ? "bg-background text-foreground shadow-sm"
@@ -259,6 +260,7 @@ export function AuthPanel() {
               Sign in
             </button>
             <button
+              aria-pressed={mode === "signup"}
               className={`rounded-md px-3 py-2 text-sm font-semibold transition ${
                 mode === "signup"
                   ? "bg-background text-foreground shadow-sm"
@@ -277,8 +279,9 @@ export function AuthPanel() {
         <CardHeader>
           <CardTitle>Play without an account</CardTitle>
           <CardDescription>
-            Guests can play, like, dislike, and report games. Guest progress is
-            temporary and guests cannot earn fictional creator Tokens.
+            Guests can play, like, dislike, report, and suggest questions.
+            Guest progress is temporary and guests cannot earn fictional
+            creator Tokens.
           </CardDescription>
         </CardHeader>
         <CardContent>
