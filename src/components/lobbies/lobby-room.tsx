@@ -421,6 +421,32 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
 
       {lobby.status === "ACTIVE" ? (
         <section className="space-y-3">
+          {initialRoom.cards.length > 0 ? (
+            <div>
+              <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+                <span>
+                  Card {lobby.current_card_index + 1} of{" "}
+                  {initialRoom.cards.length}
+                </span>
+                <span>
+                  {Math.round(
+                    ((lobby.current_card_index + 1) /
+                      initialRoom.cards.length) *
+                      100,
+                  )}
+                  %
+                </span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
+                <div
+                  className="h-full rounded-full bg-primary transition-[width] duration-300"
+                  style={{
+                    width: `${((lobby.current_card_index + 1) / initialRoom.cards.length) * 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+          ) : null}
           {currentCard ? (
             <div
               className="animate-in space-y-2 fade-in slide-in-from-right-2 duration-300"
@@ -492,62 +518,63 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
             </Card>
           ) : null}
           {isHost ? (
-            <div className="grid grid-cols-4 gap-2">
+            <div className="space-y-2">
+              <div className="grid grid-cols-4 gap-2">
+                <Button
+                  aria-label="Previous card"
+                  className="flex-col gap-0.5 text-xs"
+                  disabled={pending || lobby.current_card_index === 0}
+                  onClick={() => runControl("PREVIOUS")}
+                  size="sm"
+                  variant="outline"
+                >
+                  <ArrowLeft className="size-4" />
+                  Prev
+                </Button>
+                <Button
+                  aria-label="Skip card"
+                  className="flex-col gap-0.5 text-xs"
+                  disabled={pending}
+                  onClick={() => runControl("SKIP")}
+                  size="sm"
+                  variant="outline"
+                >
+                  <FastForward className="size-4" />
+                  Skip
+                </Button>
+                <Button
+                  aria-label="Next card"
+                  className="flex-col gap-0.5 text-xs"
+                  disabled={pending}
+                  onClick={() => runControl("NEXT")}
+                  size="sm"
+                >
+                  <ArrowRight className="size-4" />
+                  Next
+                </Button>
+                <Button
+                  aria-label="Stop the evening"
+                  className="flex-col gap-0.5 text-xs text-destructive hover:text-destructive"
+                  disabled={pending}
+                  onClick={() => runControl("END")}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Flag className="size-4" />
+                  Stop
+                </Button>
+              </div>
               <Button
-                aria-label="Previous card"
-                className="flex-col gap-0.5 text-xs"
-                disabled={pending || lobby.current_card_index === 0}
-                onClick={() => runControl("PREVIOUS")}
-                size="sm"
-                variant="outline"
-              >
-                <ArrowLeft className="size-4" />
-                Prev
-              </Button>
-              <Button
-                aria-label="Skip card"
-                className="flex-col gap-0.5 text-xs"
+                className="w-full"
                 disabled={pending}
-                onClick={() => runControl("SKIP")}
+                onClick={undoLastQuickResult}
                 size="sm"
-                variant="outline"
+                variant="ghost"
               >
-                <FastForward className="size-4" />
-                Skip
-              </Button>
-              <Button
-                aria-label="Stop the evening"
-                className="flex-col gap-0.5 text-xs"
-                disabled={pending}
-                onClick={() => runControl("END")}
-                size="sm"
-                variant="outline"
-              >
-                <Flag className="size-4" />
-                Stop
-              </Button>
-              <Button
-                aria-label="Next card"
-                className="flex-col gap-0.5 text-xs"
-                disabled={pending}
-                onClick={() => runControl("NEXT")}
-                size="sm"
-              >
-                <ArrowRight className="size-4" />
-                Next
+                <RotateCcw className="size-4" />
+                Undo last quick result
               </Button>
             </div>
-          ) : null}
-          {isHost ? (
-            <Button
-              className="w-full"
-              disabled={pending}
-              onClick={undoLastQuickResult}
-              variant="ghost"
-            >
-              <RotateCcw className="size-4" />
-              Undo last quick result
-            </Button>
           ) : null}
         </section>
       ) : null}
