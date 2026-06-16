@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
+import { FirstTimeTips } from "@/components/home/first-time-tips";
 import { ResponsiblePlayNote } from "@/components/responsible-play-note";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -128,6 +129,7 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+      <FirstTimeTips />
       <section className="mt-6 grid gap-3 sm:grid-cols-2">
         <Card>
           <CardHeader>
