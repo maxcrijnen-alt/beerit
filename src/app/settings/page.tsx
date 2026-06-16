@@ -32,8 +32,9 @@ export default async function SettingsPage() {
             <LockKeyhole className="size-5 text-primary" />
             <CardTitle>Guest mode is temporary</CardTitle>
             <CardDescription>
-              Guests can play, like, dislike, and report games. Create an
-              account to publish games, keep a profile, and earn fictional creator Tokens.
+              Guests can play, like, dislike, report, and suggest questions.
+              Create an account to publish games, keep a profile, and earn
+              fictional creator Tokens.
             </CardDescription>
           </CardHeader>
           <CardContent>
