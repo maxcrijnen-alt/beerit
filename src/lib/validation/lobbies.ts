@@ -49,6 +49,10 @@ export const scoreAndAdvanceLobbySchema = z.object({
   playerId: z.string().uuid(),
 });
 
+export const undoLastQuickResultSchema = z.object({
+  lobbyId: z.string().uuid(),
+});
+
 export const sendLobbyMessageSchema = z.object({
   lobbyId: z.string().uuid(),
   message: z.string().trim().min(1).max(500),

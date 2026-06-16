@@ -14,6 +14,7 @@ import {
   leaveLobbySchema,
   scoreAndAdvanceLobbySchema,
   sendLobbyMessageSchema,
+  undoLastQuickResultSchema,
 } from "@/lib/validation/lobbies";
 
 function lobbyError(message: string): ActionState {
@@ -170,6 +171,29 @@ export async function scoreAndAdvanceLobbyAction(formData: FormData) {
   }
 
   return { status: "success" } satisfies ActionState;
+}
+
+export async function undoLastQuickResultAction(formData: FormData) {
+  const parsed = undoLastQuickResultSchema.safeParse(Object.fromEntries(formData));
+  const actor = await getLobbyActor();
+
+  if (!parsed.success || !actor) {
+    return lobbyError("Could not undo the last result.");
+  }
+
+  const { error } = await actor.supabase.rpc("undo_last_lobby_quick_result", {
+    p_lobby_id: parsed.data.lobbyId,
+  });
+
+  if (error) {
+    return lobbyError("The last quick result can no longer be undone.");
+  }
+
+  revalidatePath(`/lobby/${parsed.data.lobbyId}`);
+  return {
+    message: "Last quick result undone.",
+    status: "success",
+  } satisfies ActionState;
 }
 
 export async function sendLobbyMessageAction(formData: FormData) {

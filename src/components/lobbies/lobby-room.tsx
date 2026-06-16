@@ -13,6 +13,7 @@ import {
   Minus,
   Play,
   Plus,
+  RotateCcw,
   Send,
   UsersRound,
 } from "lucide-react";
@@ -29,6 +30,7 @@ import {
   leaveLobbyAction,
   scoreAndAdvanceLobbyAction,
   sendLobbyMessageAction,
+  undoLastQuickResultAction,
 } from "@/app/lobby/actions";
 import { CurrentGameCard } from "@/components/games/current-game-card";
 import { GameCardVoteButtons } from "@/components/games/game-card-vote-buttons";
@@ -71,6 +73,11 @@ type LobbyMutation = (formData: FormData) => Promise<{
   status: "error" | "idle" | "success";
 }>;
 
+type MutationFeedback = {
+  message: string;
+  tone: "error" | "success";
+};
+
 const REALTIME_TIMEOUT_MS = 6000;
 
 export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
@@ -81,7 +88,8 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
   const [draft, setDraft] = useState("");
   const [onlineSessionIds, setOnlineSessionIds] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
-  const [mutationMessage, setMutationMessage] = useState<string | null>(null);
+  const [mutationFeedback, setMutationFeedback] =
+    useState<MutationFeedback | null>(null);
   const [explodedBombCardId, setExplodedBombCardId] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const lobbyQuery = useQuery({
@@ -192,9 +200,11 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         }
 
         if (!session?.access_token) {
-          setMutationMessage(
-            "Your session expired. Return to the start screen to use guest mode or sign in again.",
-          );
+          setMutationFeedback({
+            message:
+              "Your session expired. Return to the start screen to use guest mode or sign in again.",
+            tone: "error",
+          });
           return;
         }
 
@@ -221,9 +231,11 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         logDevelopmentError("Could not connect lobby realtime updates.", error);
 
         if (!cancelled) {
-          setMutationMessage(
-            "Live lobby updates could not connect. Reload the page to try again.",
-          );
+          setMutationFeedback({
+            message:
+              "Live lobby updates could not connect. Reload the page to try again.",
+            tone: "error",
+          });
         }
       }
     }
@@ -240,22 +252,32 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
   function runMutation(
     action: LobbyMutation,
     formData: FormData,
-    onSuccess?: () => void,
+    onSuccess?: (message?: string) => void,
   ) {
     setPending(true);
-    setMutationMessage(null);
+    setMutationFeedback(null);
     startTransition(async () => {
       try {
         const result = await action(formData);
 
         if (result.status === "error") {
-          setMutationMessage(result.message ?? "Try again.");
+          setMutationFeedback({
+            message: result.message ?? "Try again.",
+            tone: "error",
+          });
         } else {
-          onSuccess?.();
+          onSuccess?.(result.message);
+          void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
+          void queryClient.invalidateQueries({
+            queryKey: ["lobby-players", lobbyId],
+          });
         }
       } catch (error) {
         logDevelopmentError("Could not update the lobby.", error);
-        setMutationMessage("Could not update the lobby. Try again.");
+        setMutationFeedback({
+          message: "Could not update the lobby. Try again.",
+          tone: "error",
+        });
       } finally {
         setPending(false);
       }
@@ -288,6 +310,18 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
     runMutation(scoreAndAdvanceLobbyAction, formData);
   }
 
+  function undoLastQuickResult() {
+    const formData = new FormData();
+
+    formData.set("lobbyId", lobbyId);
+    runMutation(undoLastQuickResultAction, formData, (message) => {
+      setMutationFeedback({
+        message: message ?? "Last quick result undone.",
+        tone: "success",
+      });
+    });
+  }
+
   function sendMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData();
@@ -311,7 +345,10 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
       window.setTimeout(() => setCopied(false), 1500);
     } catch (error) {
       logDevelopmentError("Could not copy the lobby code.", error);
-      setMutationMessage("Could not copy the lobby code.");
+      setMutationFeedback({
+        message: "Could not copy the lobby code.",
+        tone: "error",
+      });
     }
   }
 
@@ -333,9 +370,15 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         </Button>
       </section>
 
-      {mutationMessage ? (
-        <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-          {mutationMessage}
+      {mutationFeedback ? (
+        <p
+          className={
+            mutationFeedback.tone === "error"
+              ? "rounded-lg bg-destructive/10 p-3 text-sm text-destructive"
+              : "rounded-lg bg-primary/10 p-3 text-sm text-primary"
+          }
+        >
+          {mutationFeedback.message}
         </p>
       ) : null}
 
@@ -463,7 +506,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
                 <FastForward className="size-4" />
               </Button>
               <Button
-                aria-label="End game"
+                aria-label="Stop the evening"
                 disabled={pending}
                 onClick={() => runControl("END")}
                 variant="outline"
@@ -479,6 +522,17 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
               </Button>
             </div>
           ) : null}
+          {isHost ? (
+            <Button
+              className="w-full"
+              disabled={pending}
+              onClick={undoLastQuickResult}
+              variant="ghost"
+            >
+              <RotateCcw className="size-4" />
+              Undo last quick result
+            </Button>
+          ) : null}
         </section>
       ) : null}
 
@@ -492,6 +546,17 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
               </CardDescription>
             </CardHeader>
           </Card>
+          {isHost ? (
+            <Button
+              className="w-full"
+              disabled={pending}
+              onClick={undoLastQuickResult}
+              variant="outline"
+            >
+              <RotateCcw className="size-4" />
+              Undo last quick result
+            </Button>
+          ) : null}
           <div>
             <h2 className="font-semibold">What would you like to do next?</h2>
             <p className="mt-1 text-xs leading-5 text-muted-foreground">
