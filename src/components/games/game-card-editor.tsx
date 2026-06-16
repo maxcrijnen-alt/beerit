@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { toTitleCase } from "@/lib/utils";
 import type { GameFormValues } from "@/lib/validation/games";
 import {
   GAME_ACTIVITY_KINDS,
@@ -313,7 +314,7 @@ export function GameCardEditor({
                 >
                   {GAME_CARD_TYPES.map((value) => (
                     <option key={value} value={value}>
-                      {value.replaceAll("_", " ")}
+                      {toTitleCase(value)}
                     </option>
                   ))}
                 </Select>
@@ -343,7 +344,7 @@ export function GameCardEditor({
                   <option value="">Not an activity</option>
                   {GAME_ACTIVITY_KINDS.map((value) => (
                     <option key={value} value={value}>
-                      {value.replaceAll("_", " ")}
+                      {toTitleCase(value)}
                     </option>
                   ))}
                 </Select>

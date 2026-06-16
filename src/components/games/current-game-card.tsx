@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn, toTitleCase } from "@/lib/utils";
 import Link from "next/link";
 import type { GameCard } from "@/types/database";
 
@@ -23,10 +23,10 @@ export function CurrentGameCard({
     <Card>
       <CardHeader>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary">{card.card_type.replaceAll("_", " ")}</Badge>
+          <Badge variant="secondary">{toTitleCase(card.card_type)}</Badge>
           <Badge variant="outline">{card.intensity}</Badge>
           {card.activity_kind ? (
-            <Badge variant="outline">{card.activity_kind.replaceAll("_", " ")}</Badge>
+            <Badge variant="outline">{toTitleCase(card.activity_kind)}</Badge>
           ) : null}
           {card.is_community ? <Badge variant="outline">Community</Badge> : null}
           {card.timer_behavior === "RANDOM_BOMB" ? (
@@ -41,8 +41,8 @@ export function CurrentGameCard({
       </CardHeader>
       <CardContent>
         <p className="text-xs text-muted-foreground">
-          Suggested value: {card.beerits_value}{" "}
-          {card.beerits_value === 1 ? "Beerit" : "Beerits"}
+          This round: {card.beerits_value}{" "}
+          {card.beerits_value === 1 ? "fictional Beerit" : "fictional Beerits"}
         </p>
         {card.card_type === "ACTIVITY" ? (
           <Link

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { requireViewer } from "@/lib/auth/require-viewer";
 import { fetchModerationQueue } from "@/lib/social/queries";
+import { toTitleCase } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -74,7 +75,7 @@ export default async function ModerationPage() {
                 <div className="space-y-2 rounded-lg bg-muted p-3">
                   {game.reports.map((report) => (
                     <div className="text-xs" key={report.id}>
-                      <p className="font-semibold">{report.reason.replaceAll("_", " ")}</p>
+                      <p className="font-semibold">{toTitleCase(report.reason)}</p>
                       {report.details ? (
                         <p className="mt-1 text-muted-foreground">{report.details}</p>
                       ) : null}
