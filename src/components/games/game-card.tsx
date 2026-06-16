@@ -76,13 +76,14 @@ export function GameCard({ game }: GameCardProps) {
           className={cn(buttonVariants({ variant: "outline" }), "w-full")}
           href={`/games/${game.id}`}
         >
-          Details
+          View details
         </Link>
         <Link
           className={cn(buttonVariants(), "w-full")}
           href={`/lobby/create/${game.id}`}
         >
-          Start
+          <Play className="size-4" />
+          Play
         </Link>
       </CardFooter>
     </Card>

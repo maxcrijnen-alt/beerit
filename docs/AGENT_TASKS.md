@@ -57,13 +57,22 @@ Avoid while Codex is actively editing:
 
 ## Current Branches
 
-- `main`: production-ready baseline.
-- `chore/project-audit`: audit branch with no feature changes.
-- `codex/agent-qa-workflow`: Codex QA and coordination docs.
-
-If Claude starts Milestone 13A, use a branch such as:
-
-- `claude/milestone-13a-core-bugs`
+- `main`: production-ready baseline. Includes Codex gameplay speed
+  foundation (realtime, undo, bomb mode, evening summary).
+- `codex/game-topics-schema`: Codex game topics schema work. Adds
+  `game_topics`, card-topic links, topic-aware community questions, starter
+  topics, and matching TypeScript/query/action support. Avoid further changes
+  to those schema/data-flow files until this integration lands.
+- `claude/continuous-ux-content-polish`: Claude Code continuous UX,
+  copy, and content polish. Changes: toTitleCase utility, "Start je
+  avond" home page, lobby status human-readable labels (Waiting room /
+  Playing / Finished), scoreboard hidden on FINISHED (Evening Summary
+  shows ranked list), "This round: X fictional Beerits" on cards,
+  Profile Achievements card rename + dashed coming-soon badges, game
+  form rules placeholder + visibility toTitleCase, lobby list status
+  badges, ONLY_SELECTED client-side validation in lobby create form,
+  game detail Remix button guest hint, landing page Token fictional
+  clarification. No schema or mutation changes.
 
 If Codex starts a technical implementation milestone, use a branch such as:
 
@@ -73,30 +82,17 @@ If Codex starts a technical implementation milestone, use a branch such as:
 
 ## Near-Term Backlog
 
-### Milestone 13A: Stabilize Core Bugs
+### Milestone 13A: Stabilize Core Bugs - DONE
 
-Owner: one implementation agent only.
+Owner: Codex (migration + RPC fix), Claude (UI validation).
 
-Expected files:
+Completed on `main` (Codex gameplay-speed-foundation + Claude
+continuous-ux-content-polish):
 
-- `src/lib/validation/games.ts`
-- `src/components/games/game-card-editor.tsx`
-- `src/components/games/add-game-cards-form.tsx`
-- `src/lib/validation/lobbies.ts`
-- `src/components/lobbies/lobby-create-form.tsx`
-- possibly a Supabase migration under `supabase/migrations/`
-
-Acceptance:
-
-- Changing a card type clears or sets `activityKind` and `timerSeconds`
-  correctly.
-- Creating normal question/dare games does not fail because hidden activity or
-  timer fields retained stale values.
-- Adding cards to existing games follows the same rule.
-- Offline-only card games can create a lobby when suitable card-game activity
-  cards exist.
-- If no matching offline activity exists, the user sees a clear error and no
-  orphan lobby is left behind.
+- Card type change now resets `activityKind` and `timerSeconds` correctly.
+- ONLY_SELECTED lobby mode shows a client-side error and disables submit
+  when no activity kinds are checked (lobby-create-form.tsx).
+- Supabase migration fixes `snapshot_lobby_cards`.
 
 ### Milestone 13B: Bomb Mode Foundation
 
@@ -139,10 +135,31 @@ Owner: split between Community Agent and Gameplay Agent.
 
 Technical direction:
 
+- Add topics per game so questions can be grouped into packs such as Football,
+  Spicy, Student House, Physical Games, and Quick Categories.
 - Keep cloud suggestions weighted and moderated.
+- Let guests suggest questions, including topic-linked questions, without
+  earning Tokens.
 - Add session-only lobby questions that do not save to the cloud.
 - Keep guest suggestions allowed but non-tokenized.
 - Keep reports reasoned; dislikes do not require a reason.
+- Keep Spicy topics opt-in for adult groups and out of default random flows
+  until explicit UX support is built.
+
+## UX/Content QA Checklist
+
+For every UX branch:
+
+- [ ] No raw enum values displayed to users (use toTitleCase).
+- [ ] No "Tokens available" - must say "fictional points, no real-world value".
+- [ ] No "Suggested value" for Beerits - use "This round: X fictional Beerits".
+- [ ] Lobby status shows human-readable: Waiting room / Playing / Finished.
+- [ ] Evening Summary visible on FINISHED; regular scoreboard hidden.
+- [ ] Remix button shows "Remix (sign in)" for guests.
+- [ ] Rules textarea has Setup/How to play/Scoring placeholder.
+- [ ] Achievements section clearly marked as coming soon (dashed badges).
+- [ ] Responsible play note visible on every major screen.
+- [ ] ONLY_SELECTED lobby mode validates client-side before submit.
 
 ## Review Checklist
 

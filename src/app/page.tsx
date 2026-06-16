@@ -17,7 +17,7 @@ const benefits = [
     title: "Bring your group",
   },
   {
-    description: "Registered creators can publish remixes and earn Tokens.",
+    description: "Registered creators can publish remixes and earn fictional creator Tokens.",
     icon: Sparkles,
     title: "Create and remix",
   },

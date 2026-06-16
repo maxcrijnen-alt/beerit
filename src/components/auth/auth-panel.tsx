@@ -242,7 +242,7 @@ export function AuthPanel() {
         <CardHeader>
           <CardTitle>Welcome to Beerit</CardTitle>
           <CardDescription>
-            Sign in to create games and earn creator Tokens.
+            Sign in to create games and earn fictional creator Tokens.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -278,7 +278,7 @@ export function AuthPanel() {
           <CardTitle>Play without an account</CardTitle>
           <CardDescription>
             Guests can play, like, dislike, and report games. Guest progress is
-            temporary and guests cannot earn Tokens.
+            temporary and guests cannot earn fictional creator Tokens.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -5,6 +5,7 @@ import type {
   GameCard,
   GameDetail,
   GameSummary,
+  GameTopic,
 } from "@/types/database";
 
 interface CreatorRelation {
@@ -23,6 +24,11 @@ interface GameSummaryRow extends Game {
 interface GameDetailRow extends Game {
   creator: CreatorRelation | null;
   game_cards: GameCard[];
+}
+
+interface GameCardTopicRow {
+  game_card_id: string;
+  topic_id: string;
 }
 
 const SUMMARY_SELECT = `
@@ -98,6 +104,50 @@ export async function fetchGameById(id: string): Promise<GameDetail | null> {
   const visibleCards = [...row.game_cards]
     .filter((card) => !card.is_hidden)
     .sort((a, b) => a.position - b.position);
+  const cardIds = visibleCards.map((card) => card.id);
+  const [topicsResult, cardTopicsResult] = await Promise.all([
+    supabase
+      .from("game_topics")
+      .select("*")
+      .eq("game_id", row.id)
+      .eq("is_hidden", false)
+      .order("sort_order", { ascending: true })
+      .order("title", { ascending: true }),
+    cardIds.length > 0
+      ? supabase
+          .from("game_card_topics")
+          .select("game_card_id, topic_id")
+          .in("game_card_id", cardIds)
+      : { data: [], error: null },
+  ]);
+
+  if (topicsResult.error) {
+    throw new Error(`Could not fetch game topics: ${topicsResult.error.message}`);
+  }
+
+  if (cardTopicsResult.error) {
+    throw new Error(
+      `Could not fetch game card topics: ${cardTopicsResult.error.message}`,
+    );
+  }
+
+  const topics = topicsResult.data as GameTopic[];
+  const topicsById = new Map(topics.map((topic) => [topic.id, topic]));
+  const topicIdsByCard = new Map<string, string[]>();
+
+  for (const relation of cardTopicsResult.data as GameCardTopicRow[]) {
+    const topicIds = topicIdsByCard.get(relation.game_card_id) ?? [];
+
+    topicIds.push(relation.topic_id);
+    topicIdsByCard.set(relation.game_card_id, topicIds);
+  }
+
+  const visibleCardsWithTopics = visibleCards.map((card) => ({
+    ...card,
+    topics: (topicIdsByCard.get(card.id) ?? [])
+      .map((topicId) => topicsById.get(topicId))
+      .filter((topic): topic is GameTopic => Boolean(topic)),
+  }));
 
   if (row.remixed_from_game_id) {
     const { data: original } = await supabase
@@ -111,11 +161,12 @@ export async function fetchGameById(id: string): Promise<GameDetail | null> {
 
   return {
     ...row,
-    cards: visibleCards.filter((card) => !card.is_community),
+    cards: visibleCardsWithTopics.filter((card) => !card.is_community),
     cards_count: visibleCards.length,
-    community_cards: visibleCards.filter((card) => card.is_community),
+    community_cards: visibleCardsWithTopics.filter((card) => card.is_community),
     creator_username: row.creator?.username ?? null,
     remixed_from_title: remixedFromTitle,
+    topics,
   };
 }
 

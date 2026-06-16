@@ -5,8 +5,10 @@ import { getViewer } from "@/lib/auth/viewer";
 import { logDevelopmentError } from "@/lib/dev-log";
 import { createClient } from "@/lib/supabase/server";
 import {
+  createGameTopicSchema,
   communityGameCardSchema,
   type CommunityGameCardValues,
+  type CreateGameTopicValues,
 } from "@/lib/validation/games";
 import {
   moderateGameSchema,
@@ -48,10 +50,11 @@ export async function submitCommunityGameCardAction(
     };
   }
 
-  const { error } = await supabase.rpc("submit_community_game_card", {
+  const { error } = await supabase.rpc("submit_community_game_card_with_topic", {
     p_game_id: parsed.data.gameId,
     p_intensity: parsed.data.intensity,
     p_text: parsed.data.text,
+    p_topic_id: parsed.data.topicId ?? null,
   });
 
   if (error) {
@@ -62,6 +65,45 @@ export async function submitCommunityGameCardAction(
   revalidateSocialPages(parsed.data.gameId);
 
   return { message: "Question added.", status: "success" };
+}
+
+export async function createGameTopicAction(
+  values: CreateGameTopicValues,
+): Promise<SocialActionResult<{ topicId: string }>> {
+  const parsed = createGameTopicSchema.safeParse(values);
+
+  if (!parsed.success) {
+    return { message: "Check the topic details.", status: "error" };
+  }
+
+  const [viewer, supabase] = await Promise.all([getViewer(), createClient()]);
+
+  if (!viewer || !supabase) {
+    return {
+      message: "Sign in or start guest mode before adding a topic.",
+      status: "error",
+    };
+  }
+
+  const { data, error } = await supabase.rpc("create_game_topic", {
+    p_description: parsed.data.description || null,
+    p_game_id: parsed.data.gameId,
+    p_is_spicy: parsed.data.isSpicy,
+    p_title: parsed.data.title,
+  });
+
+  if (error || !data) {
+    logDevelopmentError("Could not create a game topic.", error);
+    return { message: "Could not add the topic. Try again.", status: "error" };
+  }
+
+  revalidateSocialPages(parsed.data.gameId);
+
+  return {
+    data: { topicId: data as string },
+    message: "Topic added.",
+    status: "success",
+  };
 }
 
 export async function setGameCardVoteAction(

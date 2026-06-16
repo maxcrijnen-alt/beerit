@@ -67,6 +67,14 @@ export const communityGameCardSchema = z.object({
   gameId: z.string().uuid(),
   intensity: z.enum(GAME_INTENSITIES),
   text: z.string().trim().min(1, "Enter your question.").max(600),
+  topicId: z.string().uuid().nullable().optional(),
+});
+
+export const createGameTopicSchema = z.object({
+  description: z.string().trim().max(240, "Use at most 240 characters.").optional(),
+  gameId: z.string().uuid(),
+  isSpicy: z.boolean().default(false),
+  title: z.string().trim().min(2, "Use at least 2 characters.").max(40),
 });
 
 export const newGameCardsSchema = z.object({
@@ -116,6 +124,7 @@ export const gameFormSchema = z
 
 export type GameFormValues = z.infer<typeof gameFormSchema>;
 export type CommunityGameCardValues = z.infer<typeof communityGameCardSchema>;
+export type CreateGameTopicValues = z.infer<typeof createGameTopicSchema>;
 export type NewGameCardsValues = z.infer<typeof newGameCardsSchema>;
 export type UpdateGameConceptValues = z.infer<typeof updateGameConceptSchema>;
 

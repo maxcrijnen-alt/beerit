@@ -29,7 +29,7 @@ import {
   fetchGameCardVoteStates,
   fetchGameSocialState,
 } from "@/lib/social/queries";
-import { cn } from "@/lib/utils";
+import { cn, toTitleCase } from "@/lib/utils";
 import type { GameSocialState } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -68,7 +68,7 @@ function GameDetailContent({
           <Badge variant="secondary">{game.category}</Badge>
           <Badge variant="outline">{game.intensity}</Badge>
           {game.visibility !== "PUBLIC" ? (
-            <Badge variant="outline">{game.visibility}</Badge>
+            <Badge variant="outline">{toTitleCase(game.visibility)}</Badge>
           ) : null}
           {game.concept ? (
             <Badge variant="outline">Concept: {game.concept}</Badge>
@@ -137,9 +137,10 @@ function GameDetailContent({
             "w-full",
           )}
           href={canRemix ? `/games/${game.id}/remix` : "/auth"}
+          title={canRemix ? undefined : "Create an account to remix this game"}
         >
           <Copy className="size-4" />
-          Remix game
+          {canRemix ? "Remix game" : "Remix (sign in)"}
         </Link>
         {canManage ? (
           <Link
@@ -178,6 +179,27 @@ function GameDetailContent({
           ) : null}
         </CardContent>
       </Card>
+      {game.topics.length ? (
+        <section className="space-y-2">
+          <div>
+            <h2 className="font-semibold">Topics</h2>
+            <p className="text-xs leading-5 text-muted-foreground">
+              Add new questions to a topic. Spicy topics stay opt-in for adult
+              groups.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {game.topics.map((topic) => (
+              <Badge
+                key={topic.id}
+                variant={topic.is_spicy ? "secondary" : "outline"}
+              >
+                {topic.title}
+              </Badge>
+            ))}
+          </div>
+        </section>
+      ) : null}
       <section className="space-y-3">
         <div>
           <h2 className="font-semibold">Card preview</h2>
@@ -198,7 +220,11 @@ function GameDetailContent({
           </div>
         ))}
       </section>
-      <CommunityQuestionForm canSubmit={canUseCommunityActions} gameId={game.id} />
+      <CommunityQuestionForm
+        canSubmit={canUseCommunityActions}
+        gameId={game.id}
+        topics={game.topics}
+      />
       <section className="space-y-3">
         <div>
           <h2 className="font-semibold">Community questions</h2>
