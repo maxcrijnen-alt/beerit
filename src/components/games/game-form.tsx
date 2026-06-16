@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { INITIAL_ACTION_STATE } from "@/lib/auth/action-state";
+import { toTitleCase } from "@/lib/utils";
 import { gameFormSchema, type GameFormValues } from "@/lib/validation/games";
 import {
   GAME_CATEGORIES,
@@ -188,7 +189,16 @@ export function GameForm({
           </p>
           <div className="space-y-2">
             <Label htmlFor="rules">Rules</Label>
-            <Textarea id="rules" {...form.register("rules")} />
+            <Textarea
+              id="rules"
+              placeholder={"Setup\nDescribe what players need.\n\nHow to play\nExplain the turns and flow.\n\nScoring\nDescribe how Beerits are awarded."}
+              rows={6}
+              {...form.register("rules")}
+            />
+            <p className="text-xs leading-5 text-muted-foreground">
+              Optional. Use Setup / How to play / Scoring sections for clarity.
+              Keep it short — players see this before creating a lobby.
+            </p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="rulesUrl">Full rules link (optional)</Label>
@@ -207,7 +217,7 @@ export function GameForm({
             <Select id="visibility" {...form.register("visibility")}>
               {GAME_VISIBILITIES.map((value) => (
                 <option key={value} value={value}>
-                  {value}
+                  {toTitleCase(value)}
                 </option>
               ))}
             </Select>
