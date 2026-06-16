@@ -140,6 +140,28 @@ Expected result:
 - End screen shows replay, choose another game, home, and optional question
   contribution.
 
+### Quick Result Undo
+
+Run after gameplay-speed or lobby mutation changes.
+
+1. Start a lobby with at least two cards.
+2. As host, tap a losing or selected player in quick score.
+3. Confirm that player's Beerits increase and the lobby advances immediately.
+4. Tap "Undo last quick result".
+5. Confirm the Beerits adjustment is removed and the previous card returns.
+6. Quick score again, then use Skip, Previous, Next, manual plus/minus, or Stop
+   the evening before undoing.
+
+Expected result:
+
+- Undo only reverses the latest quick-result score-and-advance action.
+- Later host controls or manual score edits make the previous undo unavailable.
+- If quick score finishes the final card, undo reopens the lobby at that final
+  card.
+- Stop the evening is definitive and clears quick-result undo.
+- Friend standings still count only finished lobbies where both players used
+  registered profiles.
+
 ### Offline-Only Card Games
 
 1. Open a game detail page.

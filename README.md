@@ -55,6 +55,7 @@ Included:
   trivia, personal, and category prompts
 - Active-lobby quick score buttons that award fictional Beerits and continue
   to the next card in one action
+- Last quick-result undo so a host can recover from one accidental tap
 - End-of-game question submissions for future lobbies
 - Registered friend requests and persistent shared Beerits statistics derived
   from finished cloud lobby rooms
