@@ -2,6 +2,7 @@ import {
   Clock3,
   Copy,
   ExternalLink,
+  Flame,
   ListOrdered,
   Pencil,
   Play,
@@ -194,6 +195,7 @@ function GameDetailContent({
                 key={topic.id}
                 variant={topic.is_spicy ? "secondary" : "outline"}
               >
+                {topic.is_spicy ? <Flame className="size-3 text-primary" /> : null}
                 {topic.title}
               </Badge>
             ))}

@@ -1,3 +1,4 @@
+import { Flame } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +32,7 @@ export function CurrentGameCard({
           {card.is_community ? <Badge variant="outline">Community</Badge> : null}
           {card.topics?.map((topic) => (
             <Badge key={topic.id} variant={topic.is_spicy ? "secondary" : "outline"}>
+              {topic.is_spicy ? <Flame className="size-3 text-primary" /> : null}
               {topic.title}
             </Badge>
           ))}
