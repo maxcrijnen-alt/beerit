@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getViewer } from "@/lib/auth/viewer";
+import { trackAppEvent } from "@/lib/analytics/events";
 import { logDevelopmentError } from "@/lib/dev-log";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -63,6 +64,10 @@ export async function submitCommunityGameCardAction(
   }
 
   revalidateSocialPages(parsed.data.gameId);
+  await trackAppEvent(supabase, {
+    eventType: "COMMUNITY_QUESTION_ADDED",
+    gameId: parsed.data.gameId,
+  });
 
   return { message: "Question added.", status: "success" };
 }
@@ -98,6 +103,10 @@ export async function createGameTopicAction(
   }
 
   revalidateSocialPages(parsed.data.gameId);
+  await trackAppEvent(supabase, {
+    eventType: "GAME_TOPIC_ADDED",
+    gameId: parsed.data.gameId,
+  });
 
   return {
     data: { topicId: data as string },

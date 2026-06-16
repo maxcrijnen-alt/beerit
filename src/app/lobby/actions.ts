@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import type { ActionState } from "@/lib/auth/action-state";
 import { getViewerDisplayName } from "@/lib/auth/display-name";
 import { getViewer } from "@/lib/auth/viewer";
+import { trackAppEvent } from "@/lib/analytics/events";
 import { createClient } from "@/lib/supabase/server";
 import {
   adjustBeeritsSchema,
@@ -75,6 +76,11 @@ export async function createLobbyAction(
   }
 
   revalidatePath("/lobby");
+  await trackAppEvent(actor.supabase, {
+    eventType: "LOBBY_CREATED",
+    gameId: parsed.data.gameId,
+    lobbyId: data,
+  });
   redirect(`/lobby/${data}`);
 }
 
@@ -125,6 +131,13 @@ export async function controlLobbyAction(formData: FormData) {
 
   if (error) {
     return lobbyError("Only the host can use that gameplay control.");
+  }
+
+  if (parsed.data.control === "START" || parsed.data.control === "END") {
+    await trackAppEvent(actor.supabase, {
+      eventType: parsed.data.control === "START" ? "LOBBY_STARTED" : "LOBBY_ENDED",
+      lobbyId: parsed.data.lobbyId,
+    });
   }
 
   revalidatePath(`/lobby/${parsed.data.lobbyId}`);
