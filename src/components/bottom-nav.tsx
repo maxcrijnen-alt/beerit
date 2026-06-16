@@ -38,6 +38,7 @@ export function BottomNav({ profileHref }: BottomNavProps) {
 
           return (
             <Link
+              aria-current={active ? "page" : undefined}
               className={cn(
                 "relative flex min-h-14 touch-manipulation flex-col items-center justify-center gap-1 rounded-[1rem] text-[11px] font-semibold text-muted-foreground transition-[background-color,color,transform] duration-150 active:scale-95",
                 active && "bg-primary/10 text-primary",

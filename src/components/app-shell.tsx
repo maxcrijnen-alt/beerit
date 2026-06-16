@@ -33,9 +33,11 @@ export function AppShell({ children, viewer }: AppShellProps) {
             Beerit
           </Link>
           <div className="flex items-center gap-2">
-            <Badge variant={viewer.isAnonymous ? "secondary" : "outline"}>
-              {viewer.isAnonymous ? "Guest" : displayName}
-            </Badge>
+            <Link aria-label="Open your profile" href={profileHref}>
+              <Badge variant={viewer.isAnonymous ? "secondary" : "outline"}>
+                {viewer.isAnonymous ? "Guest" : displayName}
+              </Badge>
+            </Link>
             <form action="/auth/signout" method="post">
               <button
                 aria-label="Sign out"
