@@ -2,6 +2,7 @@ import {
   Clock3,
   Copy,
   ExternalLink,
+  Flame,
   ListOrdered,
   Pencil,
   Play,
@@ -194,6 +195,9 @@ function GameDetailContent({
                 key={topic.id}
                 variant={topic.is_spicy ? "secondary" : "outline"}
               >
+                {topic.is_spicy ? (
+                  <Flame className="mr-0.5 size-3 text-primary" />
+                ) : null}
                 {topic.title}
               </Badge>
             ))}
@@ -248,7 +252,8 @@ function GameDetailContent({
           ))
         ) : (
           <p className="rounded-lg bg-secondary p-3 text-sm text-muted-foreground">
-            No community questions yet.
+            No community questions yet. Use the form above to suggest the
+            first one — it may appear in future lobbies for this game.
           </p>
         )}
       </section>

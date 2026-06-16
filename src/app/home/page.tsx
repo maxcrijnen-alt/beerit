@@ -25,6 +25,19 @@ import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
+const timeChips = [
+  { label: "≤15 min", href: "/browse?maxDuration=15" },
+  { label: "≤30 min", href: "/browse?maxDuration=30" },
+  { label: "Any length", href: "/browse" },
+] as const;
+
+const vibeChips = [
+  { label: "Soft", href: "/browse?intensity=Soft" },
+  { label: "Funny", href: "/browse?intensity=Funny" },
+  { label: "Spicy", href: "/browse?intensity=Spicy" },
+  { label: "Chaos", href: "/browse?intensity=Chaos" },
+] as const;
+
 export default async function HomePage() {
   const viewer = await requireViewer();
   const name = viewer.profile?.username ?? viewer.guestName ?? "friend";
@@ -34,50 +47,84 @@ export default async function HomePage() {
       <section className="relative overflow-hidden rounded-[2rem] border border-border/80 bg-card p-5 shadow-[0_20px_55px_rgba(48,34,18,0.10)]">
         <div className="absolute -right-16 -top-20 size-44 rounded-full bg-primary/15 blur-3xl" />
         <div className="absolute -bottom-24 left-6 size-40 rounded-full bg-accent/70 blur-3xl" />
-        <div className="relative space-y-3">
+        <div className="relative space-y-4">
           <Badge variant={viewer.isAnonymous ? "secondary" : "outline"}>
             {viewer.isAnonymous ? "Guest mode" : "Registered creator"}
           </Badge>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <h1 className="text-4xl font-semibold tracking-[-0.04em]">
               Start je avond, {name}.
             </h1>
             <p className="text-sm leading-6 text-muted-foreground">
               Pick a game, open a lobby, and play on one phone or across
-              devices. No setup needed - just hit play and pass the phone.
+              devices.
             </p>
           </div>
-          <div className="grid gap-3 pt-2">
-            <Link
-              className={cn(buttonVariants({ size: "lg" }), "w-full")}
-              href="/browse?intent=random"
-            >
-              <Shuffle className="size-4" />
-              Pick random game
-              <ArrowRight className="ml-auto size-4" />
-            </Link>
-            <div className="grid grid-cols-2 gap-3">
-              <Link
-                className={cn(
-                  buttonVariants({ size: "lg", variant: "outline" }),
-                  "w-full",
-                )}
-                href="/browse"
-              >
-                <Search className="size-4" />
-                Browse
-              </Link>
-              <Link
-                className={cn(
-                  buttonVariants({ size: "lg", variant: "outline" }),
-                  "w-full",
-                )}
-                href="/lobby"
-              >
-                <Gamepad2 className="size-4" />
-                Lobby
-              </Link>
+          <Link
+            className={cn(buttonVariants({ size: "lg" }), "w-full")}
+            href="/browse?intent=random"
+          >
+            <Shuffle className="size-4" />
+            Pick random game
+            <ArrowRight className="ml-auto size-4" />
+          </Link>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-muted-foreground">
+              How much time?
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {timeChips.map(({ href, label }) => (
+                <Link
+                  className={cn(
+                    buttonVariants({ size: "sm", variant: "outline" }),
+                  )}
+                  href={href}
+                  key={label}
+                >
+                  {label}
+                </Link>
+              ))}
             </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-muted-foreground">
+              What&apos;s the vibe?
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {vibeChips.map(({ href, label }) => (
+                <Link
+                  className={cn(
+                    buttonVariants({ size: "sm", variant: "outline" }),
+                  )}
+                  href={href}
+                  key={label}
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 pt-1">
+            <Link
+              className={cn(
+                buttonVariants({ size: "lg", variant: "outline" }),
+                "w-full",
+              )}
+              href="/browse"
+            >
+              <Search className="size-4" />
+              Browse all
+            </Link>
+            <Link
+              className={cn(
+                buttonVariants({ size: "lg", variant: "outline" }),
+                "w-full",
+              )}
+              href="/lobby"
+            >
+              <Gamepad2 className="size-4" />
+              Join lobby
+            </Link>
           </div>
         </div>
       </section>
@@ -110,7 +157,7 @@ export default async function HomePage() {
             <CardDescription>
               {viewer.isAnonymous
                 ? "Guest progress stays temporary. Create an account to keep a profile."
-                : `${viewer.profile?.total_tokens ?? 0} creator Tokens - fictional points, no real-world value.`}
+                : `${viewer.profile?.total_tokens ?? 0} creator Tokens — fictional points, no real-world value.`}
             </CardDescription>
           </CardHeader>
           <CardContent>

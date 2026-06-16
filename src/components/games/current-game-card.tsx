@@ -1,8 +1,9 @@
+import { Flame } from "lucide-react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, toTitleCase } from "@/lib/utils";
-import Link from "next/link";
 import type { GameCard } from "@/types/database";
 
 interface CurrentGameCardProps {
@@ -16,21 +17,29 @@ export function CurrentGameCard({
 }: CurrentGameCardProps) {
   const randomBombTimerLabel =
     card.timer_min_seconds && card.timer_max_seconds
-      ? `${card.timer_min_seconds}-${card.timer_max_seconds}s bomb timer`
+      ? `${card.timer_min_seconds}–${card.timer_max_seconds}s bomb timer`
       : "Random bomb timer";
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <Badge variant="secondary">{toTitleCase(card.card_type)}</Badge>
           <Badge variant="outline">{card.intensity}</Badge>
           {card.activity_kind ? (
             <Badge variant="outline">{toTitleCase(card.activity_kind)}</Badge>
           ) : null}
-          {card.is_community ? <Badge variant="outline">Community</Badge> : null}
+          {card.is_community ? (
+            <Badge variant="outline">Community</Badge>
+          ) : null}
           {card.topics?.map((topic) => (
-            <Badge key={topic.id} variant={topic.is_spicy ? "secondary" : "outline"}>
+            <Badge
+              key={topic.id}
+              variant={topic.is_spicy ? "secondary" : "outline"}
+            >
+              {topic.is_spicy ? (
+                <Flame className="mr-0.5 size-3 text-primary" />
+              ) : null}
               {topic.title}
             </Badge>
           ))}
@@ -40,18 +49,24 @@ export function CurrentGameCard({
           {card.timer_seconds ? (
             <Badge variant="outline">{card.timer_seconds}s timer</Badge>
           ) : null}
-          <span className="text-xs text-muted-foreground">{label}</span>
+          <span className="ml-auto text-xs text-muted-foreground">{label}</span>
         </div>
-        <CardTitle className="pt-1 text-base leading-6">{card.text}</CardTitle>
+        <CardTitle className="pt-2 text-lg leading-snug">{card.text}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         <p className="text-xs text-muted-foreground">
-          This round: {card.beerits_value} fictional{" "}
-          {card.beerits_value === 1 ? "Beerit" : "Beerits"}
+          This round:{" "}
+          <span className="font-semibold">
+            {card.beerits_value} fictional{" "}
+            {card.beerits_value === 1 ? "Beerit" : "Beerits"}
+          </span>
         </p>
         {card.card_type === "ACTIVITY" ? (
           <Link
-            className={cn(buttonVariants({ size: "sm", variant: "outline" }), "mt-3 w-full")}
+            className={cn(
+              buttonVariants({ size: "sm", variant: "outline" }),
+              "mt-3 w-full",
+            )}
             href={`/games/${card.game_id}`}
           >
             Read full rules

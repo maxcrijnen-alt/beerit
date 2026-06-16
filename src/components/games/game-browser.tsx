@@ -24,6 +24,7 @@ import {
 import { buildRandomLobbyCreateHref } from "@/lib/lobbies/defaults";
 import { logDevelopmentError } from "@/lib/dev-log";
 import { useGameFiltersStore } from "@/stores/game-filters";
+import { GAME_CATEGORIES, GAME_INTENSITIES } from "@/types/database";
 import type { DiscoveryPool, GameCategory, GameSummary } from "@/types/database";
 
 interface GameBrowserProps {
@@ -78,6 +79,9 @@ export function GameBrowser({ games }: GameBrowserProps) {
     query,
     randomSeed,
     recentRandomGameIds,
+    setCategory,
+    setDurationMaxMinutes,
+    setIntensity,
     setPool,
     setSort,
     sort,
@@ -94,6 +98,50 @@ export function GameBrowser({ games }: GameBrowserProps) {
     setPool("SURPRISE");
     setSort("random");
   }, [searchParams, setPool, setSort]);
+  const hasAppliedQuickFilters = useRef(false);
+  useEffect(() => {
+    if (hasAppliedQuickFilters.current) {
+      return;
+    }
+
+    const maxDuration = searchParams.get("maxDuration");
+    const intensityParam = searchParams.get("intensity");
+    const categoryParam = searchParams.get("category");
+
+    if (!maxDuration && !intensityParam && !categoryParam) {
+      return;
+    }
+
+    hasAppliedQuickFilters.current = true;
+
+    if (maxDuration) {
+      const parsed = Number(maxDuration);
+
+      if (!Number.isNaN(parsed)) {
+        setDurationMaxMinutes(parsed);
+      }
+    }
+
+    if (intensityParam) {
+      const isValid = (
+        v: string,
+      ): v is (typeof GAME_INTENSITIES)[number] | "ALL" =>
+        (["ALL", ...GAME_INTENSITIES] as string[]).includes(v);
+
+      if (isValid(intensityParam)) {
+        setIntensity(intensityParam);
+      }
+    }
+
+    if (categoryParam) {
+      const isValid = (v: string): v is (typeof GAME_CATEGORIES)[number] =>
+        (GAME_CATEGORIES as readonly string[]).includes(v);
+
+      if (isValid(categoryParam)) {
+        setCategory(categoryParam);
+      }
+    }
+  }, [searchParams, setCategory, setDurationMaxMinutes, setIntensity]);
 
   const visibleGames = useMemo(() => {
     // A new seed intentionally recalculates the weighted random ordering.
