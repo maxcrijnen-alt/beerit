@@ -172,3 +172,35 @@ For every branch:
 - Does it work for guests where required?
 - Does it keep gameplay lobby-first?
 - Did lint and build pass?
+
+## Branch Log
+
+### claude/gameplay-polish-home (Claude, UX)
+
+Scope: mobile gameplay polish, Start Avond flow, physical-game clarity,
+topics filtering, onboarding, and a scoreboard ranking bug fix. No schema,
+RPC, or score-mutation logic touched. Lint + build green on every commit.
+
+- Home: "Start avond" quick-start chips (time + vibe) deep-linking to
+  /browse with prefilled filters; dismissible first-time tips card
+  (localStorage, useSyncExternalStore).
+- Browse: compact game cards, collapsible filter panel, random-first layout,
+  URL-param filter init (maxDuration / intensity / category).
+- Game detail: topic badges now filter the card preview (new
+  GameTopicCards), Flame on spicy topics, physical-equipment "bring your
+  own" note, improved community-questions empty state.
+- Lobby room: FIXED scoreboard/evening-summary ranking — players now sort
+  ascending so the fewest-Beerits leader is crowned #1 (was crowning the
+  most-penalised player); tie copy; "Fewest fictional Beerits leads"
+  subtitle; card progress bar; Stop button separated/coloured; chat made
+  secondary; activity "Read full rules" opens a new tab to keep the lobby
+  alive.
+- Shared: src/lib/games/categories.ts (PHYSICAL_GAME_CATEGORIES helper,
+  reused by game-browser).
+- Polish: not-found icon + browse link, tappable header badge, bottom-nav
+  aria-current, auth panel guest copy + toggle aria-pressed, own-profile
+  empty-state CTA.
+
+Codex: please sanity-check that fetchGameById populates cards[].topics (the
+topic filter degrades to an unfiltered preview if not) and confirm the
+ascending scoreboard sort matches the intended lower-is-better rule.
