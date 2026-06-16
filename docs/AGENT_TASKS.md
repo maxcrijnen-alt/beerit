@@ -70,8 +70,9 @@ Avoid while Codex is actively editing:
   copy, fictional Beerits / no-debts language, navigation control labels
   (Undo / Skip / Stop / Next), toTitleCase utility for enum displays,
   lobby status human-readable labels, game form rules placeholder,
-  Achievements card polish, ONLY_SELECTED client validation, and
-  beginner guides for Rapid Fire Timer / Bomb Mode / Game Night
+  Achievements card polish, ONLY_SELECTED client validation,
+  configurable TimedEventTimer label ("Round timer" for timed cards),
+  and beginner guides for Rapid Fire Timer / Bomb Mode / Game Night
   Activities. No schema changes; no mutation logic changes.
 
 If Codex starts a technical implementation milestone, use a branch such as:
