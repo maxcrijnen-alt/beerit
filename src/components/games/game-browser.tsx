@@ -254,7 +254,6 @@ export function GameBrowser({ games }: GameBrowserProps) {
 
   return (
     <div className="space-y-4">
-      <GameFilters />
       <section className="relative overflow-hidden rounded-[1.5rem] border border-border/80 bg-card p-4 shadow-[0_16px_45px_rgba(48,34,18,0.08)]">
         <div className="absolute -right-12 -top-14 size-36 rounded-full bg-primary/15 blur-3xl" />
         <div className="relative space-y-3">
@@ -293,6 +292,7 @@ export function GameBrowser({ games }: GameBrowserProps) {
           ) : null}
         </div>
       </section>
+      <GameFilters />
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold">
           {visibleGames.length} {visibleGames.length === 1 ? "game" : "games"}

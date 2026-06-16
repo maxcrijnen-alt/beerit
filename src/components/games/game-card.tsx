@@ -1,6 +1,7 @@
 import {
   Clock3,
   Heart,
+  Layers,
   Play,
   ThumbsDown,
   UsersRound,
@@ -11,7 +12,6 @@ import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -25,27 +25,28 @@ interface GameCardProps {
 
 export function GameCard({ game }: GameCardProps) {
   const playerRange = game.max_players
-    ? `${game.min_players}-${game.max_players}`
+    ? `${game.min_players}–${game.max_players}`
     : `${game.min_players}+`;
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader>
-        <div className="flex flex-wrap items-center gap-2">
+      <CardHeader className="pb-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <Badge variant="secondary">{game.category}</Badge>
           <Badge variant="outline">{game.intensity}</Badge>
         </div>
-        <CardTitle className="pt-1 text-xl">{game.title}</CardTitle>
-        <CardDescription>{game.description}</CardDescription>
+        <CardTitle className="pt-1 text-lg leading-snug">{game.title}</CardTitle>
+        {game.description ? (
+          <p className="line-clamp-2 text-sm text-muted-foreground">
+            {game.description}
+          </p>
+        ) : null}
         {game.concept ? (
           <p className="text-xs text-primary">Concept: {game.concept}</p>
         ) : null}
-        <p className="text-xs text-muted-foreground">
-          by {game.creator_username ? `@${game.creator_username}` : "Beerit"}
-        </p>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="grid grid-cols-3 gap-2 rounded-2xl bg-secondary/60 p-3 text-xs text-muted-foreground">
+      <CardContent className="pb-3 pt-0">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <UsersRound className="size-3.5 text-primary" />
             {playerRange}
@@ -56,10 +57,8 @@ export function GameCard({ game }: GameCardProps) {
           </span>
           <span className="flex items-center gap-1.5">
             <Play className="size-3.5 text-primary" />
-            {game.plays_count}
+            {game.plays_count} plays
           </span>
-        </div>
-        <div className="flex gap-4 px-1 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <Heart className="size-3.5" />
             {game.likes_count}
@@ -68,21 +67,27 @@ export function GameCard({ game }: GameCardProps) {
             <ThumbsDown className="size-3.5" />
             {game.dislikes_count}
           </span>
-          <span>{game.cards_count} cards</span>
+          <span className="flex items-center gap-1">
+            <Layers className="size-3.5" />
+            {game.cards_count}
+          </span>
+          <span className="ml-auto">
+            by {game.creator_username ? `@${game.creator_username}` : "Beerit"}
+          </span>
         </div>
       </CardContent>
-      <CardFooter className="grid grid-cols-2 gap-2">
+      <CardFooter className="gap-2 pt-0">
         <Link
-          className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+          className={cn(buttonVariants({ variant: "outline", size: "sm" }), "flex-1")}
           href={`/games/${game.id}`}
         >
           View details
         </Link>
         <Link
-          className={cn(buttonVariants(), "w-full")}
+          className={cn(buttonVariants({ size: "sm" }), "flex-[2]")}
           href={`/lobby/create/${game.id}`}
         >
-          <Play className="size-4" />
+          <Play className="size-3.5" />
           Play
         </Link>
       </CardFooter>
