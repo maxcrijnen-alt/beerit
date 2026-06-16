@@ -250,7 +250,7 @@ function GameDetailContent({
           ))
         ) : (
           <p className="rounded-lg bg-secondary p-3 text-sm text-muted-foreground">
-            No community questions yet.
+            No community questions yet. Be the first to suggest one above.
           </p>
         )}
       </section>

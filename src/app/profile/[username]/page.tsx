@@ -113,7 +113,9 @@ function ProfileContent({
           <h2 className="font-semibold">Created games</h2>
           <p className="text-xs text-muted-foreground">
             {games.length === 0
-              ? "No visible games yet."
+              ? isOwnProfile
+                ? "No games yet. Publish one to see it here."
+                : "No visible games yet."
               : `${games.length} ${games.length === 1 ? "game" : "games"} available.`}
           </p>
         </div>
