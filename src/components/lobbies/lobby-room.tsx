@@ -320,7 +320,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
       <section className="flex items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap gap-2">
-            <Badge>{lobby.status}</Badge>
+            <Badge>{lobby.status === "WAITING" ? "Waiting room" : lobby.status === "ACTIVE" ? "Playing" : "Finished"}</Badge>
             <Badge variant="outline">{players.length} players</Badge>
           </div>
           <h1 className="mt-3 text-2xl font-semibold tracking-tight">
@@ -344,8 +344,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
           <CardHeader>
             <CardTitle>Waiting room</CardTitle>
             <CardDescription>
-              Share the lobby code. One-phone play can start immediately with
-              the host as the only connected device.
+              Share the lobby code with your group — or start immediately for one-phone play. Everyone joins the same waiting room before the first card appears.
             </CardDescription>
           </CardHeader>
           {isHost ? (

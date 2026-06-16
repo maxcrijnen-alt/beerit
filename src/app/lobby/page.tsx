@@ -68,7 +68,9 @@ export default async function LobbyPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <Badge variant="outline">{lobby.status}</Badge>
+                      <Badge variant="outline">
+                        {lobby.status === "WAITING" ? "Waiting room" : lobby.status === "ACTIVE" ? "Playing" : "Finished"}
+                      </Badge>
                       <p className="mt-2 flex items-center justify-end gap-1 text-xs text-muted-foreground">
                         <UsersRound className="size-3" />
                         {lobby.players_count}

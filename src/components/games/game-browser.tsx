@@ -266,8 +266,7 @@ export function GameBrowser({ games }: GameBrowserProps) {
               Pick a random lobby
             </h2>
             <p className="text-sm leading-5 text-muted-foreground">
-              Uses your filters, avoids recent picks on this device, and still
-              sends everyone through lobby setup. No stakes or rewards involved.
+              Uses your filters, avoids games you have picked recently, and sends everyone through lobby setup. Beerits are fictional in-game points only.
             </p>
           </div>
           <Button
@@ -293,15 +292,9 @@ export function GameBrowser({ games }: GameBrowserProps) {
           ) : null}
         </div>
       </section>
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold">
-          {visibleGames.length} {visibleGames.length === 1 ? "game" : "games"}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          Top score:{" "}
-          {visibleGames[0] ? calculateGameScore(visibleGames[0]).toFixed(1) : "-"}
-        </p>
-      </div>
+      <p className="text-sm font-semibold">
+        {visibleGames.length} {visibleGames.length === 1 ? "game" : "games"}
+      </p>
       {visibleGames.length === 0 ? (
         <EmptyState
           description="Try removing one of your filters or search for a broader term."
