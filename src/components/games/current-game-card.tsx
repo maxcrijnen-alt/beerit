@@ -1,5 +1,4 @@
-import { Flame } from "lucide-react";
-import Link from "next/link";
+import { ExternalLink, Flame } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -62,15 +61,20 @@ export function CurrentGameCard({
           </span>
         </p>
         {card.card_type === "ACTIVITY" ? (
-          <Link
+          // Open in a new tab so reading the rules never navigates a host out
+          // of a live lobby (which would drop their realtime connection).
+          <a
             className={cn(
               buttonVariants({ size: "sm", variant: "outline" }),
               "mt-3 w-full",
             )}
             href={`/games/${card.game_id}`}
+            rel="noreferrer"
+            target="_blank"
           >
+            <ExternalLink className="size-4" />
             Read full rules
-          </Link>
+          </a>
         ) : null}
       </CardContent>
     </Card>
