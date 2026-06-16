@@ -108,7 +108,9 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
     queryKey: ["lobby-messages", lobbyId],
   });
   const lobby = lobbyQuery.data;
-  const players = [...playersQuery.data].sort((a, b) => b.beerits - a.beerits);
+  // Fewest Beerits leads: Beerits are penalty points, so lower is better. The
+  // leader sits at the top of the scoreboard and the evening summary.
+  const players = [...playersQuery.data].sort((a, b) => a.beerits - b.beerits);
   const messages = messagesQuery.data;
   const currentCard = initialRoom.cards[lobby.current_card_index] ?? null;
   const currentCardId = currentCard?.id ?? null;
@@ -586,7 +588,9 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
               <CardTitle>Evening summary</CardTitle>
               <CardDescription>
                 {players[0]
-                  ? `${players[0].display_name} finishes with the fewest Beerits.`
+                  ? players[1] && players[1].beerits === players[0].beerits
+                    ? "It's a tie for the fewest Beerits. Rematch to break it."
+                    : `${players[0].display_name} finishes with the fewest Beerits.`
                   : "No scores recorded."}
               </CardDescription>
             </CardHeader>
@@ -644,7 +648,9 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
               <UsersRound className="size-4 text-primary" />
               <CardTitle>Scoreboard</CardTitle>
             </div>
-            <span className="text-xs text-muted-foreground">Fictieve Beerits</span>
+            <span className="text-xs text-muted-foreground">
+              Fewest fictional Beerits leads
+            </span>
           </div>
         </CardHeader>
         <CardContent className="space-y-2">
