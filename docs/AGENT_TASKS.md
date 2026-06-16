@@ -58,11 +58,18 @@ Avoid while Codex is actively editing:
 ## Current Branches
 
 - `main`: production-ready baseline. Includes Codex gameplay speed
-  foundation (realtime, undo, bomb mode, evening summary).
-- `codex/game-topics-schema`: Codex game topics schema work. Adds
-  `game_topics`, card-topic links, topic-aware community questions, starter
-  topics, and matching TypeScript/query/action support. Avoid further changes
-  to those schema/data-flow files until this integration lands.
+  foundation (realtime, undo, bomb mode, evening summary), Codex game
+  topics schema, and Claude continuous UX/content polish. Deployed to
+  production.
+- `codex/topic-creation-ui`: Codex topic-creation UI work. Touches
+  `src/components/games/community-question-form.tsx`. Do not edit that
+  file until this branch is merged.
+- `claude/ux-topics-and-polish`: Claude Code UX polish on top of topics.
+  Changes: Flame icon on spicy topic badges (game detail + current card),
+  chat made visually secondary in lobby room, more inviting empty-state
+  copy (community questions, own profile), live-app UX QA checklist.
+  No schema, query, or mutation changes; community-question-form.tsx
+  untouched.
 - `claude/continuous-ux-content-polish`: Claude Code continuous UX,
   copy, and content polish. Changes: toTitleCase utility, "Start je
   avond" home page, lobby status human-readable labels (Waiting room /
