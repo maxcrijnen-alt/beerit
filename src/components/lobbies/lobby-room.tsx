@@ -667,11 +667,13 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         </CardContent>
       </Card> : null}
 
-      <Card>
+      <Card className="bg-secondary/30">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <MessageCircle className="size-4 text-primary" />
-            <CardTitle>Lobby chat</CardTitle>
+            <MessageCircle className="size-4 text-muted-foreground" />
+            <CardTitle className="text-base text-muted-foreground">
+              Lobby chat
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
