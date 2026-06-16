@@ -60,10 +60,19 @@ Avoid while Codex is actively editing:
 - `main`: production-ready baseline.
 - `chore/project-audit`: audit branch with no feature changes.
 - `codex/agent-qa-workflow`: Codex QA and coordination docs.
-
-If Claude starts Milestone 13A, use a branch such as:
-
-- `claude/milestone-13a-core-bugs`
+- `claude/physical-game-content`: Claude Code — eight new physical games
+  (arm wrestling, thumb war, rock-paper-scissors, staring contest, coin
+  flip, snap race, tic-tac-toe, three dice bingo) with beginner guides;
+  also beginner guides for the original ten offline games. No shared
+  files touched.
+- `claude/gameplay-speed-ux`: Claude Code — Milestone B gameplay UX
+  polish. Evening summary on finished lobby, "Stop de avond" / "Rematch"
+  copy, fictional Beerits / no-debts language, navigation control labels
+  (Undo / Skip / Stop / Next), toTitleCase utility for enum displays,
+  lobby status human-readable labels, game form rules placeholder,
+  Achievements card polish, ONLY_SELECTED client validation, and
+  beginner guides for Rapid Fire Timer / Bomb Mode / Game Night
+  Activities. No schema changes; no mutation logic changes.
 
 If Codex starts a technical implementation milestone, use a branch such as:
 
@@ -73,30 +82,18 @@ If Codex starts a technical implementation milestone, use a branch such as:
 
 ## Near-Term Backlog
 
-### Milestone 13A: Stabilize Core Bugs
+### Milestone 13A: Stabilize Core Bugs — DONE
 
-Owner: one implementation agent only.
+Owner: Codex (migration + RPC fix), Claude (UI validation).
 
-Expected files:
+Completed work on `claude/gameplay-speed-ux` and Codex migrations:
 
-- `src/lib/validation/games.ts`
-- `src/components/games/game-card-editor.tsx`
-- `src/components/games/add-game-cards-form.tsx`
-- `src/lib/validation/lobbies.ts`
-- `src/components/lobbies/lobby-create-form.tsx`
-- possibly a Supabase migration under `supabase/migrations/`
-
-Acceptance:
-
-- Changing a card type clears or sets `activityKind` and `timerSeconds`
-  correctly.
-- Creating normal question/dare games does not fail because hidden activity or
-  timer fields retained stale values.
-- Adding cards to existing games follows the same rule.
-- Offline-only card games can create a lobby when suitable card-game activity
-  cards exist.
-- If no matching offline activity exists, the user sees a clear error and no
-  orphan lobby is left behind.
+- Card type change now resets `activityKind` and `timerSeconds` correctly
+  via onChange handler in `GameCardEditor` (game-card-editor.tsx).
+- ONLY_SELECTED lobby mode shows a client-side error and disables submit
+  when no activity kinds are checked (lobby-create-form.tsx).
+- Supabase migration fixes `snapshot_lobby_cards` so base game cards
+  always appear regardless of activity selection mode.
 
 ### Milestone 13B: Bomb Mode Foundation
 
