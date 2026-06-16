@@ -4,6 +4,8 @@ import { AppShell } from "@/components/app-shell";
 import { LobbyJoinForm } from "@/components/lobbies/lobby-join-form";
 import { ResponsiblePlayNote } from "@/components/responsible-play-note";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -57,7 +59,13 @@ export default async function LobbyPage() {
           {lobbies.length ? (
             lobbies.map((lobby) => (
               <Link href={`/lobby/${lobby.id}`} key={lobby.id}>
-                <Card className="transition hover:border-primary/60">
+                <Card
+                  className={
+                    lobby.status === "ACTIVE"
+                      ? "border-primary/40 transition hover:border-primary/70"
+                      : "transition hover:border-primary/40"
+                  }
+                >
                   <CardContent className="flex items-center justify-between gap-3 p-4">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold">
@@ -67,17 +75,22 @@ export default async function LobbyPage() {
                         {lobby.code}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <Badge variant="outline">
+                    <div className="flex shrink-0 flex-col items-end gap-1.5">
+                      <Badge
+                        variant={
+                          lobby.status === "ACTIVE" ? "default" : "outline"
+                        }
+                      >
                         {lobby.status === "WAITING"
                           ? "Waiting room"
                           : lobby.status === "ACTIVE"
                             ? "Playing"
                             : "Finished"}
                       </Badge>
-                      <p className="mt-2 flex items-center justify-end gap-1 text-xs text-muted-foreground">
+                      <p className="flex items-center gap-1 text-xs text-muted-foreground">
                         <UsersRound className="size-3" />
-                        {lobby.players_count}
+                        {lobby.players_count}{" "}
+                        {lobby.players_count === 1 ? "player" : "players"}
                       </p>
                     </div>
                   </CardContent>
@@ -86,8 +99,16 @@ export default async function LobbyPage() {
             ))
           ) : (
             <Card>
-              <CardContent className="p-5 text-sm text-muted-foreground">
-                No lobby rooms yet. Choose a game from Browse to create one.
+              <CardContent className="space-y-3 p-5">
+                <p className="text-sm text-muted-foreground">
+                  No lobby rooms yet.
+                </p>
+                <Link
+                  className={cn(buttonVariants({ variant: "secondary", size: "sm" }), "w-full")}
+                  href="/browse"
+                >
+                  Browse games to create one
+                </Link>
               </CardContent>
             </Card>
           )}

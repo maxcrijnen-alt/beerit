@@ -152,19 +152,46 @@ export default async function FriendsPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-2 gap-2 text-center">
-                    <div className="rounded-lg bg-secondary p-3">
+                    <div
+                      className={
+                        friend.your_beerits < friend.friend_beerits
+                          ? "rounded-lg bg-primary/10 p-3 ring-1 ring-primary/30"
+                          : "rounded-lg bg-secondary p-3"
+                      }
+                    >
                       <p className="text-lg font-semibold">{friend.your_beerits}</p>
-                      <p className="text-xs text-muted-foreground">Your Beerits</p>
+                      <p className="text-xs text-muted-foreground">
+                        You
+                        {friend.your_beerits < friend.friend_beerits
+                          ? " · fewer Beerits"
+                          : null}
+                      </p>
                     </div>
-                    <div className="rounded-lg bg-secondary p-3">
+                    <div
+                      className={
+                        friend.friend_beerits < friend.your_beerits
+                          ? "rounded-lg bg-primary/10 p-3 ring-1 ring-primary/30"
+                          : "rounded-lg bg-secondary p-3"
+                      }
+                    >
                       <p className="text-lg font-semibold">
                         {friend.friend_beerits}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Their Beerits
+                        @{friend.friend_username}
+                        {friend.friend_beerits < friend.your_beerits
+                          ? " · fewer Beerits"
+                          : null}
                       </p>
                     </div>
                   </div>
+                  <p className="text-center text-xs text-muted-foreground">
+                    {friend.your_beerits === friend.friend_beerits
+                      ? "Tied — lower Beerits wins"
+                      : friend.your_beerits < friend.friend_beerits
+                        ? "You have fewer fictional Beerits — that's the lead."
+                        : `@${friend.friend_username} has fewer fictional Beerits.`}
+                  </p>
                   <FriendshipActions friendship={friend} />
                 </CardContent>
               </Card>
