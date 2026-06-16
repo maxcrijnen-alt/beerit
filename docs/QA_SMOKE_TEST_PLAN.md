@@ -16,6 +16,29 @@ Expected result:
 - No secrets are printed.
 - No generated folders are staged.
 
+## Route Health Checks
+
+Run these after starting the app locally, after a Vercel preview deploy, and
+after production deploys:
+
+```bash
+curl http://localhost:3000/api/health
+curl http://localhost:3000/
+curl http://localhost:3000/browse
+curl "http://localhost:3000/browse?intent=random"
+```
+
+For production, replace `http://localhost:3000` with
+`https://beerit.vercel.app`.
+
+Expected result:
+
+- `/api/health` returns HTTP 200 and JSON with `app: "beerit"`.
+- In configured environments, `checks.supabasePublicConfig` is `configured`.
+- Landing and browse routes return HTTP 200.
+- No route stays stuck on only `Loading Beerit...`.
+- No secret values are returned by the health endpoint.
+
 ## Git Safety Check
 
 ```bash
