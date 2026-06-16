@@ -73,7 +73,7 @@ export const communityGameCardSchema = z.object({
 export const createGameTopicSchema = z.object({
   description: z.string().trim().max(240, "Use at most 240 characters.").optional(),
   gameId: z.string().uuid(),
-  isSpicy: z.boolean().default(false),
+  isSpicy: z.boolean().optional(),
   title: z.string().trim().min(2, "Use at least 2 characters.").max(40),
 });
 

@@ -88,7 +88,7 @@ export async function createGameTopicAction(
   const { data, error } = await supabase.rpc("create_game_topic", {
     p_description: parsed.data.description || null,
     p_game_id: parsed.data.gameId,
-    p_is_spicy: parsed.data.isSpicy,
+    p_is_spicy: parsed.data.isSpicy ?? false,
     p_title: parsed.data.title,
   });
 
