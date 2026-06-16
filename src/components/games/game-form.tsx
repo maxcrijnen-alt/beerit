@@ -100,14 +100,22 @@ export function GameForm({
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
-            <Input id="title" {...form.register("title")} />
+            <Input
+              id="title"
+              placeholder="For example: Student House Showdown"
+              {...form.register("title")}
+            />
             <p className="text-xs text-destructive">
               {form.formState.errors.title?.message}
             </p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
-            <Textarea id="description" {...form.register("description")} />
+            <Textarea
+              id="description"
+              placeholder="One or two sentences on what makes this game fun and who it's for."
+              {...form.register("description")}
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
