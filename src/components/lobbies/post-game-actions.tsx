@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Plus, RotateCcw, Search, X } from "lucide-react";
+import { DoorOpen, Plus, RotateCcw, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { CommunityQuestionForm } from "@/components/games/community-question-form";
@@ -22,7 +22,7 @@ export function PostGameActions({ gameId }: PostGameActionsProps) {
           href={`/lobby/create/${gameId}`}
         >
           <RotateCcw className="size-4" />
-          Play again
+          Rematch
         </Link>
         <Link
           className={cn(
@@ -41,8 +41,8 @@ export function PostGameActions({ gameId }: PostGameActionsProps) {
           )}
           href="/home"
         >
-          <Home className="size-4" />
-          Back to home
+          <DoorOpen className="size-4" />
+          Stop de avond
         </Link>
       </div>
 
