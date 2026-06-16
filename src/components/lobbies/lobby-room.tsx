@@ -392,6 +392,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
               ) : currentCard.timer_seconds ? (
                 <TimedEventTimer
                   key={`${currentCard.id}:${currentCard.timer_seconds}`}
+                  label="Round timer"
                   seconds={currentCard.timer_seconds}
                 />
               ) : null}
