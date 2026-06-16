@@ -40,11 +40,11 @@ export default async function HomePage() {
           </Badge>
           <div className="space-y-2">
             <h1 className="text-4xl font-semibold tracking-[-0.04em]">
-              Ready to play, {name}?
+              Start je avond, {name}.
             </h1>
             <p className="text-sm leading-6 text-muted-foreground">
-              Browse a game or enter a lobby code. Every play session runs
-              through a live lobby, including one-phone play.
+              Pick a game, open a lobby, and play on one phone or across
+              devices. No setup needed — just hit play and pass the phone.
             </p>
           </div>
           <div className="grid gap-3 pt-2">
@@ -109,8 +109,8 @@ export default async function HomePage() {
             <CardTitle>Your profile</CardTitle>
             <CardDescription>
               {viewer.isAnonymous
-                ? "Guest progress stays temporary."
-                : `${viewer.profile?.total_tokens ?? 0} creator Tokens available.`}
+                ? "Guest progress stays temporary. Create an account to keep a profile."
+                : `${viewer.profile?.total_tokens ?? 0} creator Tokens — fictional points, no real-world value.`}
             </CardDescription>
           </CardHeader>
           <CardContent>

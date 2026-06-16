@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { INITIAL_ACTION_STATE } from "@/lib/auth/action-state";
+import { toTitleCase } from "@/lib/utils";
 import {
   newGameCardsSchema,
   type NewGameCardsValues,
@@ -309,7 +310,7 @@ export function AddGameCardsForm({
                 >
                   {GAME_CARD_TYPES.map((value) => (
                     <option key={value} value={value}>
-                      {value.replaceAll("_", " ")}
+                      {toTitleCase(value)}
                     </option>
                   ))}
                 </Select>
@@ -339,7 +340,7 @@ export function AddGameCardsForm({
                   <option value="">Not an activity</option>
                   {GAME_ACTIVITY_KINDS.map((value) => (
                     <option key={value} value={value}>
-                      {value.replaceAll("_", " ")}
+                      {toTitleCase(value)}
                     </option>
                   ))}
                 </Select>

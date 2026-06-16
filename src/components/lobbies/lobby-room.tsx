@@ -357,7 +357,13 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
       <section className="flex items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap gap-2">
-            <Badge>{lobby.status}</Badge>
+            <Badge>
+              {lobby.status === "WAITING"
+                ? "Waiting room"
+                : lobby.status === "ACTIVE"
+                  ? "Playing"
+                  : "Finished"}
+            </Badge>
             <Badge variant="outline">{players.length} players</Badge>
           </div>
           <h1 className="mt-3 text-2xl font-semibold tracking-tight">
@@ -604,7 +610,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         </section>
       ) : null}
 
-      <Card>
+      {lobby.status !== "FINISHED" ? <Card>
         <CardHeader>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -659,7 +665,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
             </div>
           ))}
         </CardContent>
-      </Card>
+      </Card> : null}
 
       <Card>
         <CardHeader>
