@@ -109,8 +109,8 @@ export default async function HomePage() {
             <CardTitle>Your profile</CardTitle>
             <CardDescription>
               {viewer.isAnonymous
-                ? "Guest progress stays temporary."
-                : `${viewer.profile?.total_tokens ?? 0} creator Tokens available.`}
+                ? "Guest progress stays temporary. Create an account to keep a profile."
+                : `${viewer.profile?.total_tokens ?? 0} creator Tokens — fictional creator points, no real-world value.`}
             </CardDescription>
           </CardHeader>
           <CardContent>
