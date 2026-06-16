@@ -45,33 +45,33 @@ export function GameCard({ game }: GameCardProps) {
         </p>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
+        <div className="grid grid-cols-3 gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <UsersRound className="size-3.5 text-primary" />
+            <UsersRound className="size-3.5 shrink-0 text-primary" />
             {playerRange}
           </span>
           <span className="flex items-center gap-1.5">
-            <Clock3 className="size-3.5 text-primary" />
+            <Clock3 className="size-3.5 shrink-0 text-primary" />
             {game.estimated_duration ?? "?"} min
           </span>
           <span className="flex items-center gap-1.5">
-            <Play className="size-3.5 text-primary" />
+            <Play className="size-3.5 shrink-0 text-primary" />
             {game.plays_count}
           </span>
         </div>
         <div className="flex gap-4 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1.5">
             <Heart className="size-3.5" />
             {game.likes_count}
           </span>
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1.5">
             <ThumbsDown className="size-3.5" />
             {game.dislikes_count}
           </span>
-          <span>{game.cards_count} cards</span>
+          <span className="ml-auto">{game.cards_count} cards</span>
         </div>
       </CardContent>
-      <CardFooter className="grid grid-cols-2 gap-2">
+      <CardFooter className="grid grid-cols-2 gap-3">
         <Link
           className={cn(buttonVariants({ variant: "outline" }), "w-full")}
           href={`/games/${game.id}`}

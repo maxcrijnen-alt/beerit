@@ -87,28 +87,28 @@ function GameDetailContent({
           </p>
         ) : null}
       </section>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-3">
         <Card>
-          <CardContent className="p-3 text-center">
-            <UsersRound className="mx-auto size-4 text-primary" />
+          <CardContent className="p-4 text-center">
+            <UsersRound className="mx-auto size-5 text-primary" />
             <p className="mt-2 text-sm font-semibold">{playerRange}</p>
-            <p className="text-[11px] text-muted-foreground">Players</p>
+            <p className="text-xs text-muted-foreground">Players</p>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-3 text-center">
-            <Clock3 className="mx-auto size-4 text-primary" />
+          <CardContent className="p-4 text-center">
+            <Clock3 className="mx-auto size-5 text-primary" />
             <p className="mt-2 text-sm font-semibold">
               {game.estimated_duration ?? "?"} min
             </p>
-            <p className="text-[11px] text-muted-foreground">Duration</p>
+            <p className="text-xs text-muted-foreground">Duration</p>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-3 text-center">
-            <ListOrdered className="mx-auto size-4 text-primary" />
+          <CardContent className="p-4 text-center">
+            <ListOrdered className="mx-auto size-5 text-primary" />
             <p className="mt-2 text-sm font-semibold">{game.cards_count}</p>
-            <p className="text-[11px] text-muted-foreground">Cards</p>
+            <p className="text-xs text-muted-foreground">Cards</p>
           </CardContent>
         </Card>
       </div>

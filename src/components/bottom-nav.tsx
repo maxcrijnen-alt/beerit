@@ -39,8 +39,8 @@ export function BottomNav({ profileHref }: BottomNavProps) {
           return (
             <Link
               className={cn(
-                "relative flex min-h-16 touch-manipulation flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted-foreground transition-[color,transform] duration-150 active:scale-95",
-                active && "text-primary after:absolute after:top-1 after:h-1 after:w-6 after:rounded-full after:bg-primary",
+                "relative flex min-h-16 touch-manipulation flex-col items-center justify-center gap-1 text-xs font-medium text-muted-foreground transition-[color,transform] duration-150 active:scale-95",
+                active && "text-primary after:absolute after:bottom-1.5 after:h-1 after:w-6 after:rounded-full after:bg-primary",
               )}
               href={href}
               key={label}

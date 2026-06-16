@@ -42,7 +42,7 @@ export default async function HomePage() {
           a live lobby, including one-phone play.
         </p>
       </section>
-      <section className="mt-6 grid gap-3">
+      <section className="mt-7 grid gap-4">
         <Link className={cn(buttonVariants({ size: "lg" }), "w-full")} href="/browse">
           <Search className="size-4" />
           Browse games
@@ -56,7 +56,7 @@ export default async function HomePage() {
           Join a lobby
         </Link>
       </section>
-      <section className="mt-6 grid gap-3 sm:grid-cols-2">
+      <section className="mt-7 grid gap-4 sm:grid-cols-2">
         <Card>
           <CardHeader>
             <PlusCircle className="size-5 text-primary" />

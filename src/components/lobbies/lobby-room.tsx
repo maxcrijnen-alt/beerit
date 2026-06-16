@@ -400,10 +400,10 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
                   multi-place results.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-2">
+              <CardContent className="grid grid-cols-2 gap-3">
                 {players.map((player) => (
                   <Button
-                    className="min-h-12"
+                    className="min-h-14"
                     disabled={pending}
                     key={player.id}
                     onClick={() =>
@@ -491,7 +491,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         <CardContent className="space-y-2">
           {players.map((player) => (
             <div
-              className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
+              className="flex items-center justify-between gap-3 rounded-lg border border-border p-4"
               key={player.id}
             >
               <div className="min-w-0">

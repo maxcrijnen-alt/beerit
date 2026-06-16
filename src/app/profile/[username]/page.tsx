@@ -49,30 +49,30 @@ function ProfileContent({
           Edit profile
         </Link>
       ) : null}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-3">
         <Card>
-          <CardContent className="p-3 text-center">
-            <Gamepad2 className="mx-auto size-4 text-primary" />
+          <CardContent className="p-4 text-center">
+            <Gamepad2 className="mx-auto size-5 text-primary" />
             <p className="mt-2 text-lg font-semibold">
               {profile.total_games_created}
             </p>
-            <p className="text-[11px] text-muted-foreground">Games</p>
+            <p className="text-xs text-muted-foreground">Games</p>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-3 text-center">
-            <Heart className="mx-auto size-4 text-primary" />
+          <CardContent className="p-4 text-center">
+            <Heart className="mx-auto size-5 text-primary" />
             <p className="mt-2 text-lg font-semibold">
               {profile.total_likes_received}
             </p>
-            <p className="text-[11px] text-muted-foreground">Likes</p>
+            <p className="text-xs text-muted-foreground">Likes</p>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-3 text-center">
-            <Sparkles className="mx-auto size-4 text-primary" />
+          <CardContent className="p-4 text-center">
+            <Sparkles className="mx-auto size-5 text-primary" />
             <p className="mt-2 text-lg font-semibold">{profile.total_tokens}</p>
-            <p className="text-[11px] text-muted-foreground">Tokens</p>
+            <p className="text-xs text-muted-foreground">Tokens</p>
           </CardContent>
         </Card>
       </div>
