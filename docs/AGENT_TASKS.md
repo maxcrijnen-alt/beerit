@@ -60,6 +60,9 @@ Avoid while Codex is actively editing:
 - `main`: production-ready baseline.
 - `chore/project-audit`: audit branch with no feature changes.
 - `codex/agent-qa-workflow`: Codex QA and coordination docs.
+- `claude/physical-game-content`: Claude Code — eight new offline games
+  (challenges, card, board, dice) with beginner guides and point rules,
+  added as an additive seed migration. No shared files touched.
 
 If Claude starts Milestone 13A, use a branch such as:
 
