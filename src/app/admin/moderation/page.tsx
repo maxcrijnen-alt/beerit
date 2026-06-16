@@ -1,9 +1,10 @@
-import { Eye, EyeOff, Flag, ShieldAlert, ThumbsDown } from "lucide-react";
+import { BarChart3, Eye, EyeOff, Flag, ShieldAlert, ThumbsDown } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { moderateGameAction } from "@/app/games/social-actions";
 import { AppShell } from "@/components/app-shell";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { requireViewer } from "@/lib/auth/require-viewer";
 import { fetchModerationQueue } from "@/lib/social/queries";
-import { toTitleCase } from "@/lib/utils";
+import { cn, toTitleCase } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -30,14 +31,25 @@ export default async function ModerationPage() {
     <AppShell viewer={viewer}>
       <section className="space-y-2">
         <Badge variant="outline">Admin only</Badge>
-        <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-          <ShieldAlert className="size-6 text-primary" />
-          Moderation
-        </h1>
-        <p className="text-sm leading-6 text-muted-foreground">
-          Review reported or disliked games. Hidden games disappear from public
-          browsing until an admin restores them.
-        </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-2">
+            <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+              <ShieldAlert className="size-6 text-primary" />
+              Moderation
+            </h1>
+            <p className="text-sm leading-6 text-muted-foreground">
+              Review reported or disliked games. Hidden games disappear from public
+              browsing until an admin restores them.
+            </p>
+          </div>
+          <Link
+            className={cn(buttonVariants({ variant: "secondary" }), "w-full sm:w-auto")}
+            href="/admin/analytics"
+          >
+            <BarChart3 className="size-4" />
+            Beta analytics
+          </Link>
+        </div>
       </section>
       <section className="mt-5 space-y-3">
         {games.length === 0 ? (
