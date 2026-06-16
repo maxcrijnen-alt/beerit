@@ -137,6 +137,11 @@ Expected result:
 - Lobby creates successfully.
 - One-phone play works.
 - Current card and scoreboard update.
+- The card progress bar advances as cards change.
+- Scoreboard lists the player with the FEWEST Beerits first (lower is
+  better); subtitle reads "Fewest fictional Beerits leads".
+- On End, the Evening summary crowns the player with the fewest Beerits as
+  rank #1 (not the most-penalised player); a tie shows tie copy.
 - End screen shows replay, choose another game, home, and optional question
   contribution.
 
