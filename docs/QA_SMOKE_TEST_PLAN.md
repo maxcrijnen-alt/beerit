@@ -176,6 +176,21 @@ Expected result:
 - If no matching cards exist, no orphan lobby is left behind and the user gets
   a clear error.
 
+### ONLY_SELECTED Client Validation
+
+1. Open a public game detail page.
+2. Create a lobby, select "Only selected offline games".
+3. Leave all activity checkboxes unchecked.
+4. Confirm the "Create lobby" button is disabled.
+5. Confirm a red border and inline error appear on the activity fieldset.
+6. Check at least one activity kind.
+7. Confirm the button enables.
+
+Expected result:
+
+- Cannot submit an ONLY_SELECTED lobby with zero activity kinds checked.
+- Error is visible and clear before hitting the server.
+
 ### Mixed Physical Filters
 
 1. Create a lobby with Normal mix.
