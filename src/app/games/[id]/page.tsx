@@ -3,6 +3,7 @@ import {
   Copy,
   ExternalLink,
   ListOrdered,
+  Package,
   Pencil,
   Play,
   UsersRound,
@@ -25,6 +26,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getViewer } from "@/lib/auth/viewer";
+import {
+  isPhysicalCategory,
+  physicalEquipmentLabel,
+} from "@/lib/games/categories";
 import { fetchGameById } from "@/lib/games/queries";
 import {
   fetchGameCardVoteStates,
@@ -113,6 +118,16 @@ function GameDetailContent({
           </CardContent>
         </Card>
       </div>
+      {isPhysicalCategory(game.category) ? (
+        <p className="flex items-start gap-2 rounded-lg bg-secondary p-3 text-xs leading-5 text-muted-foreground">
+          <Package className="mt-0.5 size-4 shrink-0 text-primary" />
+          <span>
+            Beerit explains and runs this game — bring{" "}
+            {physicalEquipmentLabel(game.category) ?? "your own equipment"}. We
+            do not supply physical cards, dice, or boards.
+          </span>
+        </p>
+      ) : null}
       <GameVoteButtons
         canReport={canUseCommunityActions}
         canSave={canUseCommunityActions && canRemix}

@@ -21,24 +21,19 @@ import {
   calculateTrendingScore,
   pickWeightedRandomGame,
 } from "@/lib/games/ranking";
+import { isPhysicalCategory } from "@/lib/games/categories";
 import { buildRandomLobbyCreateHref } from "@/lib/lobbies/defaults";
 import { logDevelopmentError } from "@/lib/dev-log";
 import { useGameFiltersStore } from "@/stores/game-filters";
 import { GAME_CATEGORIES, GAME_INTENSITIES } from "@/types/database";
-import type { DiscoveryPool, GameCategory, GameSummary } from "@/types/database";
+import type { DiscoveryPool, GameSummary } from "@/types/database";
 
 interface GameBrowserProps {
   games: GameSummary[];
 }
 
-const PHYSICAL_GAME_CATEGORIES = new Set<GameCategory>([
-  "Card Games",
-  "Board Games",
-  "Dice Games",
-]);
-
 function isPhysicalGame(game: GameSummary) {
-  return PHYSICAL_GAME_CATEGORIES.has(game.category);
+  return isPhysicalCategory(game.category);
 }
 
 function weightedRandomOrder(games: GameSummary[], pool: DiscoveryPool) {

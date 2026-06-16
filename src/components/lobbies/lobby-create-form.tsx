@@ -151,7 +151,9 @@ export function LobbyCreateForm({
       >
         <legend className="px-1 text-sm font-medium">Available tonight</legend>
         <p className="text-xs leading-5 text-muted-foreground">
-          Check only the equipment and game types your group can actually use.
+          Check only the equipment and game types your group actually owns.
+          Beerit explains and assigns these games but does not supply the
+          physical cards, dice, or boards.
         </p>
         <div className="space-y-2">
           {GAME_ACTIVITY_KINDS.map((activityKind) => (
