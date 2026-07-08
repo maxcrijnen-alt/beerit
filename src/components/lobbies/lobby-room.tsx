@@ -32,6 +32,7 @@ import {
   sendLobbyMessageAction,
   undoLastQuickResultAction,
 } from "@/app/lobby/actions";
+import { CommunityQuestionForm } from "@/components/games/community-question-form";
 import { CurrentGameCard } from "@/components/games/current-game-card";
 import { GameCardVoteButtons } from "@/components/games/game-card-vote-buttons";
 import { BombModeTimer } from "@/components/lobbies/bomb-mode-timer";
@@ -96,6 +97,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
   const [pending, setPending] = useState(false);
   const [scoreboardOpen, setScoreboardOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [suggestOpen, setSuggestOpen] = useState(false);
   const lobbyQuery = useQuery({
     initialData: initialRoom.lobby,
     queryFn: () => fetchLobby(lobbyId),
@@ -803,17 +805,21 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
       ) : null}
 
       {lobby.status === "ACTIVE" ? (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <Button
             onClick={() => setScoreboardOpen(true)}
             variant="outline"
           >
             <UsersRound className="size-4" />
-            Scoreboard
+            Scores
           </Button>
           <Button onClick={() => setChatOpen(true)} variant="outline">
             <MessageCircle className="size-4" />
             Chat
+          </Button>
+          <Button onClick={() => setSuggestOpen(true)} variant="outline">
+            <Plus className="size-4" />
+            Suggest
           </Button>
         </div>
       ) : null}
@@ -862,6 +868,14 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         title="Lobby chat"
       >
         {chatBody}
+      </Sheet>
+
+      <Sheet
+        onOpenChange={setSuggestOpen}
+        open={suggestOpen && lobby.status === "ACTIVE"}
+        title="Suggest a question"
+      >
+        <CommunityQuestionForm canSubmit gameId={initialRoom.game.id} />
       </Sheet>
 
       {lobby.status === "WAITING" && !isHost ? (
