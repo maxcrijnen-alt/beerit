@@ -22,11 +22,11 @@ interface RandomFilterSheetProps {
 }
 
 const POOL_LABELS: Record<DiscoveryPool, string> = {
-  HOT: "Hot",
+  HOT: "Balanced",
   MOST_LIKED: "Most liked",
-  RECENT: "Recent",
-  SURPRISE: "Surprise me",
-  TOP: "Top",
+  RECENT: "Fresh",
+  SURPRISE: "Wildcard",
+  TOP: "Best rated",
 };
 
 const DURATION_OPTIONS = [
@@ -70,11 +70,17 @@ export function RandomFilterSheet({
   const canStart = randomCategories.length > 0 && randomIntensities.length > 0;
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open} title="Random game filters">
+    <Sheet onOpenChange={onOpenChange} open={open} title="Start avond setup">
       <div className="space-y-5 pb-2">
+        <div className="rounded-2xl border border-border bg-muted/40 p-3">
+          <p className="text-sm font-semibold">Kies wat bij jullie avond past.</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            Beerit kiest daarna een lobby die past bij je spullen, tijd en vibe.
+          </p>
+        </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <Label>Categories</Label>
+            <Label>Game categories</Label>
             <Button
               onClick={() =>
                 setRandomCategories(
@@ -118,18 +124,18 @@ export function RandomFilterSheet({
           ) : null}
         </div>
         <div className="space-y-2">
-          <Label>Game type</Label>
+          <Label>Materials</Label>
           <div className="grid grid-cols-3 gap-2">
             {(
               [
-                ["BOTH", "Both"],
-                ["DIGITAL", "Prompt"],
-                ["PHYSICAL", "Physical"],
+                ["BOTH", "Anything", "Prompts or physical games"],
+                ["DIGITAL", "No materials", "Only phone prompts"],
+                ["PHYSICAL", "Use gear", "Cards, dice, or boards"],
               ] as const
-            ).map(([value, label]) => (
+            ).map(([value, label, description]) => (
               <button
                 aria-pressed={contentMode === value}
-                className={`min-h-10 rounded-xl border px-2 text-xs font-medium transition ${
+                className={`min-h-16 rounded-xl border px-2 py-2 text-left text-xs font-medium transition ${
                   contentMode === value
                     ? "border-primary bg-primary/15 text-primary"
                     : "border-border text-muted-foreground"
@@ -138,14 +144,17 @@ export function RandomFilterSheet({
                 onClick={() => setContentMode(value)}
                 type="button"
               >
-                {label}
+                <span className="block">{label}</span>
+                <span className="mt-1 block text-[10px] font-normal leading-4 text-muted-foreground">
+                  {description}
+                </span>
               </button>
             ))}
           </div>
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <Label>Intensity</Label>
+            <Label>Vibe</Label>
             <Button
               onClick={() =>
                 setRandomIntensities(
@@ -206,7 +215,7 @@ export function RandomFilterSheet({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="random-duration">Duration</Label>
+            <Label htmlFor="random-duration">Time</Label>
             <Select
               id="random-duration"
               onChange={(event) =>
@@ -227,7 +236,7 @@ export function RandomFilterSheet({
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="random-pool">Ranking mode</Label>
+          <Label htmlFor="random-pool">Random style</Label>
           <Select
             id="random-pool"
             onChange={(event) => setPool(event.target.value as DiscoveryPool)}
@@ -241,6 +250,15 @@ export function RandomFilterSheet({
           </Select>
         </div>
         <div className="space-y-2 pt-1">
+          {!canStart ? (
+            <p className="text-xs text-muted-foreground">
+              Kies minimaal een categorie en vibe, of laat Beerit alles kiezen.
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Beerit weegt likes, dislikes en recente keuzes mee bij de random pick.
+            </p>
+          )}
           <Button
             className="w-full"
             disabled={pending || !canStart}
@@ -249,7 +267,7 @@ export function RandomFilterSheet({
             type="button"
           >
             <Shuffle className="size-4" />
-            {pending ? "Picking..." : "Start random lobby"}
+            {pending ? "Picking a game..." : "Start avond"}
           </Button>
           <Button
             className="w-full"
@@ -259,7 +277,7 @@ export function RandomFilterSheet({
             variant="outline"
           >
             <Dices className="size-4" />
-            I don&rsquo;t care — surprise me
+            Skip setup - surprise me
           </Button>
         </div>
       </div>
