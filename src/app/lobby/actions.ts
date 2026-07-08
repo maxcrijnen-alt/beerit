@@ -8,8 +8,10 @@ import { getViewer } from "@/lib/auth/viewer";
 import { trackAppEvent } from "@/lib/analytics/events";
 import { createClient } from "@/lib/supabase/server";
 import {
+  addSessionQuestionSchema,
   adjustBeeritsSchema,
   controlLobbySchema,
+  deleteSessionQuestionSchema,
   createLobbySchema,
   joinLobbySchema,
   leaveLobbySchema,
@@ -228,6 +230,63 @@ export async function sendLobbyMessageAction(formData: FormData) {
   }
 
   return { status: "success" } satisfies ActionState;
+}
+
+export async function addSessionQuestionAction(formData: FormData) {
+  const parsed = addSessionQuestionSchema.safeParse(Object.fromEntries(formData));
+  const actor = await getLobbyActor();
+
+  if (!parsed.success || !actor) {
+    return lobbyError(
+      parsed.success
+        ? "Join the lobby before adding a question."
+        : (parsed.error.issues[0]?.message ?? "Check your question."),
+    );
+  }
+
+  const { error } = await actor.supabase.rpc("add_lobby_session_question", {
+    p_intensity: parsed.data.intensity,
+    p_lobby_id: parsed.data.lobbyId,
+    p_text: parsed.data.text,
+  });
+
+  if (error) {
+    return lobbyError(
+      error.message.includes("maximum")
+        ? "The session question limit for this lobby was reached."
+        : "Could not add the session question. Join the lobby and try again.",
+    );
+  }
+
+  return {
+    message: "Question added for this lobby only.",
+    status: "success",
+  } satisfies ActionState;
+}
+
+export async function deleteSessionQuestionAction(formData: FormData) {
+  const parsed = deleteSessionQuestionSchema.safeParse(
+    Object.fromEntries(formData),
+  );
+  const actor = await getLobbyActor();
+
+  if (!parsed.success || !actor) {
+    return lobbyError("Could not remove the session question.");
+  }
+
+  const { error } = await actor.supabase
+    .from("lobby_session_questions")
+    .delete()
+    .eq("id", parsed.data.questionId);
+
+  if (error) {
+    return lobbyError("Only the host or the submitter can remove a question.");
+  }
+
+  return {
+    message: "Session question removed.",
+    status: "success",
+  } satisfies ActionState;
 }
 
 export async function leaveLobbyAction(formData: FormData) {

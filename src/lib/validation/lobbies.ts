@@ -62,4 +62,15 @@ export const leaveLobbySchema = z.object({
   lobbyId: z.string().uuid(),
 });
 
+export const addSessionQuestionSchema = z.object({
+  intensity: z.enum(["Soft", "Funny", "Spicy", "Chaos"]),
+  lobbyId: z.string().uuid(),
+  text: z.string().trim().min(1, "Enter your question.").max(600),
+});
+
+export const deleteSessionQuestionSchema = z.object({
+  lobbyId: z.string().uuid(),
+  questionId: z.string().uuid(),
+});
+
 export type JoinLobbyValues = z.infer<typeof joinLobbySchema>;

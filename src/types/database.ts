@@ -259,6 +259,17 @@ export interface LobbySummary extends Lobby {
   players_count: number;
 }
 
+export interface LobbySessionQuestion {
+  beerits_value: number;
+  created_at: string;
+  display_name: string;
+  id: string;
+  intensity: GameIntensity;
+  lobby_id: string;
+  submitted_by_session_user_id: string;
+  text: string;
+}
+
 export interface LobbyRoomData {
   card_votes: Record<string, GameVoteType | null>;
   cards: GameCard[];
@@ -266,6 +277,7 @@ export interface LobbyRoomData {
   lobby: Lobby;
   messages: LobbyMessage[];
   players: LobbyPlayer[];
+  session_questions: LobbySessionQuestion[];
 }
 
 export interface FriendStanding {

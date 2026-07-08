@@ -25,8 +25,10 @@ import {
   useState,
 } from "react";
 import {
+  addSessionQuestionAction,
   adjustBeeritsAction,
   controlLobbyAction,
+  deleteSessionQuestionAction,
   leaveLobbyAction,
   scoreAndAdvanceLobbyAction,
   sendLobbyMessageAction,
@@ -58,13 +60,44 @@ import {
   fetchLobby,
   fetchLobbyMessages,
   fetchLobbyPlayers,
+  fetchLobbySessionQuestions,
 } from "@/lib/lobbies/queries-client";
 import { createClient } from "@/lib/supabase/client";
 import type {
+  GameCard,
+  GameIntensity,
   LobbyControl,
   LobbyRoomData,
+  LobbySessionQuestion,
   Viewer,
 } from "@/types/database";
+import { GAME_INTENSITIES } from "@/types/database";
+
+function sessionQuestionToCard(
+  question: LobbySessionQuestion,
+  position: number,
+): GameCard {
+  return {
+    activity_kind: null,
+    beerits_value: question.beerits_value,
+    card_type: "QUESTION",
+    created_at: question.created_at,
+    dislikes_count: 0,
+    game_id: question.lobby_id,
+    id: question.id,
+    intensity: question.intensity,
+    is_community: false,
+    is_hidden: false,
+    likes_count: 0,
+    position,
+    submitted_by_session_user_id: question.submitted_by_session_user_id,
+    text: question.text,
+    timer_behavior: "FIXED",
+    timer_max_seconds: null,
+    timer_min_seconds: null,
+    timer_seconds: null,
+  };
+}
 
 interface LobbyRoomProps {
   initialRoom: LobbyRoomData;
@@ -98,6 +131,9 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
   const [scoreboardOpen, setScoreboardOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [suggestOpen, setSuggestOpen] = useState(false);
+  const [sessionDraft, setSessionDraft] = useState("");
+  const [sessionIntensity, setSessionIntensity] =
+    useState<GameIntensity>("Funny");
   const lobbyQuery = useQuery({
     initialData: initialRoom.lobby,
     queryFn: () => fetchLobby(lobbyId),
@@ -113,10 +149,25 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
     queryFn: () => fetchLobbyMessages(lobbyId),
     queryKey: ["lobby-messages", lobbyId],
   });
+  const sessionQuestionsQuery = useQuery({
+    initialData: initialRoom.session_questions,
+    queryFn: () => fetchLobbySessionQuestions(lobbyId),
+    queryKey: ["lobby-session-questions", lobbyId],
+  });
   const lobby = lobbyQuery.data;
   const players = [...playersQuery.data].sort((a, b) => b.beerits - a.beerits);
   const messages = messagesQuery.data;
-  const currentCard = initialRoom.cards[lobby.current_card_index] ?? null;
+  const sessionQuestions = sessionQuestionsQuery.data;
+  const allCards = [
+    ...initialRoom.cards,
+    ...sessionQuestions.map((question, index) =>
+      sessionQuestionToCard(question, initialRoom.cards.length + index + 1),
+    ),
+  ];
+  const currentCard = allCards[lobby.current_card_index] ?? null;
+  const isSessionCard =
+    currentCard !== null &&
+    lobby.current_card_index >= initialRoom.cards.length;
   const currentCardId = currentCard?.id ?? null;
   const isBombModeCard = currentCard?.timer_behavior === "RANDOM_BOMB";
   const hasBombTimerRange = Boolean(
@@ -198,6 +249,20 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         () => {
           void queryClient.invalidateQueries({
             queryKey: ["lobby-messages", lobbyId],
+          });
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          filter: `lobby_id=eq.${lobbyId}`,
+          schema: "public",
+          table: "lobby_session_questions",
+        },
+        () => {
+          void queryClient.invalidateQueries({
+            queryKey: ["lobby-session-questions", lobbyId],
           });
         },
       );
@@ -336,6 +401,33 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
       setMutationFeedback({
         message: message ?? "Last quick result undone.",
         tone: "success",
+      });
+    });
+  }
+
+  function addSessionQuestion(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData();
+
+    formData.set("intensity", sessionIntensity);
+    formData.set("lobbyId", lobbyId);
+    formData.set("text", sessionDraft);
+    runMutation(addSessionQuestionAction, formData, () => {
+      setSessionDraft("");
+      void queryClient.invalidateQueries({
+        queryKey: ["lobby-session-questions", lobbyId],
+      });
+    });
+  }
+
+  function deleteSessionQuestion(questionId: string) {
+    const formData = new FormData();
+
+    formData.set("lobbyId", lobbyId);
+    formData.set("questionId", questionId);
+    runMutation(deleteSessionQuestionAction, formData, () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["lobby-session-questions", lobbyId],
       });
     });
   }
@@ -577,8 +669,17 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
             >
               <CurrentGameCard
                 card={currentCard}
-                label={`Card ${lobby.current_card_index + 1} of ${initialRoom.cards.length}`}
+                label={`Card ${lobby.current_card_index + 1} of ${allCards.length}`}
               />
+              {isSessionCard ? (
+                <p className="px-1 text-xs text-muted-foreground">
+                  Session-only question by{" "}
+                  {sessionQuestions[
+                    lobby.current_card_index - initialRoom.cards.length
+                  ]?.display_name ?? "a player"}
+                  . It disappears after this lobby.
+                </p>
+              ) : null}
               {currentCard.timer_behavior === "RANDOM_BOMB" &&
               hasBombTimerRange ? (
                 <BombModeTimer
@@ -594,15 +695,17 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
                   seconds={currentCard.timer_seconds}
                 />
               ) : null}
-              <GameCardVoteButtons
-                canVote
-                cardId={currentCard.id}
-                compact
-                dislikes={currentCard.dislikes_count}
-                initialVote={initialRoom.card_votes[currentCard.id] ?? null}
-                key={currentCard.id}
-                likes={currentCard.likes_count}
-              />
+              {!isSessionCard ? (
+                <GameCardVoteButtons
+                  canVote
+                  cardId={currentCard.id}
+                  compact
+                  dislikes={currentCard.dislikes_count}
+                  initialVote={initialRoom.card_votes[currentCard.id] ?? null}
+                  key={currentCard.id}
+                  likes={currentCard.likes_count}
+                />
+              ) : null}
             </div>
           ) : (
             <Card className="border-primary/30 bg-accent/30">
@@ -873,9 +976,82 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
       <Sheet
         onOpenChange={setSuggestOpen}
         open={suggestOpen && lobby.status === "ACTIVE"}
-        title="Suggest a question"
+        title="Add a question"
       >
-        <CommunityQuestionForm canSubmit gameId={initialRoom.game.id} />
+        <div className="space-y-4">
+          <div className="space-y-3 rounded-2xl border border-border p-3">
+            <div>
+              <p className="text-sm font-semibold">Only this lobby</p>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                Added to the end of tonight&rsquo;s card stack. Not saved to
+                the cloud and gone after this lobby. No Tokens.
+              </p>
+            </div>
+            <form className="space-y-2" onSubmit={addSessionQuestion}>
+              <Input
+                aria-label="Session question"
+                maxLength={600}
+                onChange={(event) => setSessionDraft(event.target.value)}
+                placeholder="Your question for tonight"
+                value={sessionDraft}
+              />
+              <div className="flex gap-2">
+                <select
+                  aria-label="Session question intensity"
+                  className="h-10 flex-1 rounded-md border border-input bg-transparent px-3 text-sm"
+                  onChange={(event) =>
+                    setSessionIntensity(event.target.value as GameIntensity)
+                  }
+                  value={sessionIntensity}
+                >
+                  {GAME_INTENSITIES.map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  disabled={pending || !sessionDraft.trim()}
+                  type="submit"
+                >
+                  <Plus className="size-4" />
+                  Add
+                </Button>
+              </div>
+            </form>
+            {sessionQuestions.length > 0 ? (
+              <div className="space-y-2">
+                {sessionQuestions.map((question) => (
+                  <div
+                    className="flex items-start justify-between gap-2 rounded-lg bg-secondary p-2"
+                    key={question.id}
+                  >
+                    <div className="min-w-0">
+                      <p className="text-xs">{question.text}</p>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">
+                        {question.display_name} · {question.intensity}
+                      </p>
+                    </div>
+                    {isHost ||
+                    question.submitted_by_session_user_id === viewer.id ? (
+                      <Button
+                        aria-label="Remove session question"
+                        disabled={pending}
+                        onClick={() => deleteSessionQuestion(question.id)}
+                        size="icon"
+                        type="button"
+                        variant="ghost"
+                      >
+                        <Minus className="size-4" />
+                      </Button>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <CommunityQuestionForm canSubmit gameId={initialRoom.game.id} />
+        </div>
       </Sheet>
 
       {lobby.status === "WAITING" && !isHost ? (
