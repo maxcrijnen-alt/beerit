@@ -65,6 +65,8 @@ export function RandomFilterSheet({
   } = useGameFiltersStore();
   const allCategoriesSelected =
     randomCategories.length === GAME_CATEGORIES.length;
+  const allIntensitiesSelected =
+    randomIntensities.length === GAME_INTENSITIES.length;
   const canStart = randomCategories.length > 0 && randomIntensities.length > 0;
 
   return (
@@ -142,7 +144,21 @@ export function RandomFilterSheet({
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Intensity</Label>
+          <div className="flex items-center justify-between gap-2">
+            <Label>Intensity</Label>
+            <Button
+              onClick={() =>
+                setRandomIntensities(
+                  allIntensitiesSelected ? [] : [...GAME_INTENSITIES],
+                )
+              }
+              size="sm"
+              type="button"
+              variant="ghost"
+            >
+              {allIntensitiesSelected ? "Unselect all" : "Select all"}
+            </Button>
+          </div>
           <div className="grid grid-cols-4 gap-2">
             {GAME_INTENSITIES.map((value) => {
               const selected = randomIntensities.includes(value);
