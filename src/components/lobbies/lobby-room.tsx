@@ -156,6 +156,11 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
   });
   const lobby = lobbyQuery.data;
   const players = [...playersQuery.data].sort((a, b) => b.beerits - a.beerits);
+  const finishedPlayers = [...playersQuery.data].sort(
+    (a, b) =>
+      a.beerits - b.beerits ||
+      new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime(),
+  );
   const messages = messagesQuery.data;
   const sessionQuestions = sessionQuestionsQuery.data;
   const allCards = [
@@ -810,13 +815,13 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
             <CardHeader>
               <CardTitle>Evening summary</CardTitle>
               <CardDescription>
-                {players[0]
-                  ? `${players[0].display_name} finishes with the fewest Beerits.`
+                {finishedPlayers[0]
+                  ? `${finishedPlayers[0].display_name} finishes with the fewest Beerits.`
                   : "No scores recorded."}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              {players.map((player, i) => (
+              {finishedPlayers.map((player, i) => (
                 <div
                   className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
                   key={player.id}
