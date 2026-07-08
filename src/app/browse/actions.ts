@@ -28,12 +28,23 @@ async function runPickRandomGameRpc(
     };
   }
 
+  const categories = values.categories?.length
+    ? values.categories
+    : values.category === "ALL"
+      ? []
+      : [values.category];
+  const intensities = values.intensities?.length
+    ? values.intensities
+    : values.intensity === "ALL"
+      ? []
+      : [values.intensity];
+
   const { data, error } = await supabase.rpc("pick_random_game", {
-    p_categories: values.category === "ALL" ? [] : [values.category],
+    p_categories: categories,
     p_content_mode: values.contentMode,
     p_duration_max_minutes: values.durationMaxMinutes,
     p_excluded_game_ids: excludedGameIds,
-    p_intensities: values.intensity === "ALL" ? [] : [values.intensity],
+    p_intensities: intensities,
     p_player_count: values.players,
     p_pool: values.pool,
     p_query: values.query,
