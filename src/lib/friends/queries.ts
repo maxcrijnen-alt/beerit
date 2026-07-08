@@ -14,5 +14,9 @@ export async function fetchFriendStandings(): Promise<FriendStanding[]> {
     throw new Error(`Could not fetch friends: ${error.message}`);
   }
 
-  return data as FriendStanding[];
+  return (data as FriendStanding[]).map((standing) => ({
+    ...standing,
+    friend_balance_points: Number(standing.friend_balance_points ?? 0),
+    your_balance_points: Number(standing.your_balance_points ?? 0),
+  }));
 }

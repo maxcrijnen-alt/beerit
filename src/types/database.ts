@@ -285,11 +285,13 @@ export interface LobbyRoomData {
 
 export interface FriendStanding {
   direction: "INCOMING" | "OUTGOING";
+  friend_balance_points: number;
   friend_beerits: number;
   friend_id: string;
   friend_username: string;
   friendship_id: string;
   shared_lobbies: number;
   status: "ACCEPTED" | "PENDING";
+  your_balance_points: number;
   your_beerits: number;
 }

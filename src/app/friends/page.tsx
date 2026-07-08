@@ -1,6 +1,7 @@
 import { Check, LockKeyhole, UserRound, UsersRound, X } from "lucide-react";
 import Link from "next/link";
 import {
+  markFriendBalanceEvenAction,
   removeFriendshipAction,
   respondFriendRequestAction,
 } from "@/app/friends/actions";
@@ -164,6 +165,50 @@ export default async function FriendsPage() {
                         Their Beerits
                       </p>
                     </div>
+                  </div>
+                  <div className="space-y-2 rounded-lg border border-primary/30 bg-primary/5 p-3">
+                    <p className="text-xs font-medium text-primary">
+                      Friend Balance
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-center">
+                      <div>
+                        <p className="font-mono text-lg font-semibold">
+                          {friend.your_balance_points > 0 ? "+" : ""}
+                          {friend.your_balance_points}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Your Balance Points
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-lg font-semibold">
+                          {friend.friend_balance_points > 0 ? "+" : ""}
+                          {friend.friend_balance_points}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Their Balance Points
+                        </p>
+                      </div>
+                    </div>
+                    <form action={markFriendBalanceEvenAction}>
+                      <input
+                        name="friendshipId"
+                        type="hidden"
+                        value={friend.friendship_id}
+                      />
+                      <Button
+                        className="w-full"
+                        size="sm"
+                        type="submit"
+                        variant="outline"
+                      >
+                        Mark as even
+                      </Button>
+                    </form>
+                    <p className="text-xs leading-5 text-muted-foreground">
+                      Friend Balance is a fictional friend-group score. It has
+                      no monetary value and is not a debt.
+                    </p>
                   </div>
                   <FriendshipActions friendship={friend} />
                 </CardContent>

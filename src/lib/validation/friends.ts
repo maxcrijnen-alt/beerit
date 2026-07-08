@@ -12,3 +12,7 @@ export const respondFriendRequestSchema = z.object({
 export const removeFriendshipSchema = z.object({
   friendshipId: z.string().uuid(),
 });
+
+export const markFriendBalanceEvenSchema = z.object({
+  friendshipId: z.string().uuid(),
+});
