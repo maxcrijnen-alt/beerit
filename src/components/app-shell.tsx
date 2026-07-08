@@ -21,7 +21,7 @@ export function AppShell({ children, viewer }: AppShellProps) {
 
   return (
     <div className="min-h-dvh pb-[calc(6rem+env(safe-area-inset-bottom))] text-foreground">
-      <header className="sticky top-0 z-10 border-b border-border/70 bg-background/80 pt-[env(safe-area-inset-top)] shadow-[0_10px_30px_rgba(48,34,18,0.06)] backdrop-blur-xl">
+      <header className="sticky top-0 z-10 border-b border-border/70 bg-background/80 pt-[env(safe-area-inset-top)] shadow-[0_10px_30px_rgba(0,0,0,0.30)] backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-xl items-center justify-between px-4">
           <Link
             className="flex items-center gap-2 text-[15px] font-bold tracking-tight"

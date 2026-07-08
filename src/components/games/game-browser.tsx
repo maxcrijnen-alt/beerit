@@ -324,7 +324,7 @@ export function GameBrowser({ games }: GameBrowserProps) {
   return (
     <div className="space-y-4">
       <GameFilters />
-      <section className="relative overflow-hidden rounded-[1.5rem] border border-border/80 bg-card p-4 shadow-[0_16px_45px_rgba(48,34,18,0.08)]">
+      <section className="relative overflow-hidden rounded-[1.5rem] border border-border/80 bg-card p-4 shadow-[0_16px_45px_rgba(0,0,0,0.35)]">
         <div className="absolute -right-12 -top-14 size-36 rounded-full bg-primary/15 blur-3xl" />
         <div className="relative space-y-3">
           <div className="space-y-1">

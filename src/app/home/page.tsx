@@ -39,7 +39,7 @@ export default async function HomePage() {
 
   return (
     <AppShell viewer={viewer}>
-      <section className="relative overflow-hidden rounded-[2rem] border border-border/80 bg-card p-5 shadow-[0_20px_55px_rgba(48,34,18,0.10)]">
+      <section className="relative overflow-hidden rounded-[2rem] border border-border/80 bg-card p-5 shadow-[0_20px_55px_rgba(0,0,0,0.40)]">
         <div className="absolute -right-16 -top-20 size-44 rounded-full bg-primary/15 blur-3xl" />
         <div className="absolute -bottom-24 left-6 size-40 rounded-full bg-accent/70 blur-3xl" />
         <div className="relative space-y-3">

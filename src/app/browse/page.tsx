@@ -94,7 +94,7 @@ export default async function BrowsePage() {
 
   const content = (
     <div className="space-y-4">
-      <div className="rounded-[1.5rem] border border-border/80 bg-card p-5 shadow-[0_16px_45px_rgba(48,34,18,0.08)]">
+      <div className="rounded-[1.5rem] border border-border/80 bg-card p-5 shadow-[0_16px_45px_rgba(0,0,0,0.35)]">
         <h1 className="text-3xl font-semibold tracking-[-0.04em]">
           Browse games
         </h1>
