@@ -11,7 +11,7 @@ interface TimedEventTimerProps {
 
 export function TimedEventTimer({ seconds }: TimedEventTimerProps) {
   const [remaining, setRemaining] = useState(seconds);
-  const [running, setRunning] = useState(false);
+  const [running, setRunning] = useState(true);
   const active = running && remaining > 0;
 
   useEffect(() => {
@@ -32,7 +32,9 @@ export function TimedEventTimer({ seconds }: TimedEventTimerProps) {
         <div>
           <p className="flex items-center gap-2 text-xs text-muted-foreground">
             <Timer className="size-4 text-primary" />
-            {remaining === 0 ? "Time is up" : "Rapid fire timer"}
+            {remaining === 0
+              ? "Time is up"
+              : "Rapid fire timer — started automatically"}
           </p>
           <p className="mt-1 font-mono text-3xl font-semibold">{remaining}s</p>
         </div>

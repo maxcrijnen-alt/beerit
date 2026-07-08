@@ -1,7 +1,7 @@
 "use client";
 
-import { Pause, Play, RotateCcw, Timer } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { Bomb, Pause, Play, RotateCcw, Timer } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -19,6 +19,16 @@ function getRandomDuration(minSeconds: number, maxSeconds: number) {
   return safeMin + Math.floor(Math.random() * (safeMax - safeMin + 1));
 }
 
+function vibrate(pattern: number | number[]) {
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+    try {
+      navigator.vibrate(pattern);
+    } catch {
+      // Haptics are a nice-to-have; ignore unsupported devices.
+    }
+  }
+}
+
 export function BombModeTimer({
   isHost,
   maxSeconds,
@@ -31,8 +41,8 @@ export function BombModeTimer({
   const [remaining, setRemaining] = useState(duration);
   const [running, setRunning] = useState(isHost);
   const [exploded, setExploded] = useState(false);
+  const explodedRef = useRef(false);
   const active = isHost && running && remaining > 0;
-  const progress = duration > 0 ? (remaining / duration) * 100 : 0;
 
   const resetTimer = useCallback(() => {
     const nextDuration = getRandomDuration(minSeconds, maxSeconds);
@@ -41,6 +51,7 @@ export function BombModeTimer({
     setRemaining(nextDuration);
     setRunning(isHost);
     setExploded(false);
+    explodedRef.current = false;
     onExplodedChange(false);
   }, [isHost, maxSeconds, minSeconds, onExplodedChange]);
 
@@ -53,10 +64,12 @@ export function BombModeTimer({
       setRemaining((value) => {
         const nextValue = Math.max(0, value - 1);
 
-        if (nextValue === 0) {
+        if (nextValue === 0 && !explodedRef.current) {
+          explodedRef.current = true;
           setRunning(false);
           setExploded(true);
           onExplodedChange(true);
+          vibrate([120, 60, 120, 60, 320]);
         }
 
         return nextValue;
@@ -71,64 +84,95 @@ export function BombModeTimer({
       <Card className="border-primary/30 bg-accent/30">
         <CardContent className="p-4">
           <p className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Timer className="size-4 text-primary" />
+            <Bomb className="size-4 text-primary" />
             Bomb Mode
           </p>
           <p className="mt-2 text-sm font-medium">
-            The host timer decides when it explodes.
+            The timer already started on the host phone.
           </p>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            Keep passing the phone or object until the host calls BOOM.
+            Keep passing the phone or object until BOOM.
           </p>
         </CardContent>
       </Card>
     );
   }
 
+  if (exploded) {
+    return (
+      <Card className="overflow-hidden border-primary bg-primary/15">
+        <CardContent className="relative p-6 text-center">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 animate-in fade-in zoom-in-50 duration-500 motion-reduce:animate-none"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,--theme(--color-primary/25),transparent_70%)]" />
+          </div>
+          <div className="relative animate-in zoom-in-75 duration-300 motion-reduce:animate-none">
+            <Bomb className="mx-auto size-10 text-primary" />
+            <p className="mt-2 text-5xl font-black tracking-tight">BOOM</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Tap the player holding it below. They take the Beerits and the
+              next card starts right away.
+            </p>
+            <Button
+              className="mt-4"
+              onClick={resetTimer}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              <RotateCcw className="size-4" />
+              Re-arm without scoring
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className={exploded ? "border-primary bg-primary/10" : "border-primary/30"}>
+    <Card className="border-primary/30">
       <CardContent className="space-y-3 p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="flex items-center gap-2 text-xs text-muted-foreground">
               <Timer className="size-4 text-primary" />
-              {exploded ? "Bomb Mode exploded" : "Bomb Mode timer"}
+              Bomb Mode — timer started automatically
             </p>
-            <p className="mt-1 font-mono text-4xl font-semibold">
-              {exploded ? "BOOM" : `${remaining}s`}
+            <p className="mt-1 flex items-center gap-2 text-3xl font-black tracking-tight">
+              <Bomb
+                className={`size-7 text-primary ${
+                  active ? "animate-pulse motion-reduce:animate-none" : ""
+                }`}
+              />
+              {active ? "Tick… tick…" : "Paused"}
             </p>
           </div>
           <div className="flex gap-2">
-            {!exploded ? (
-              <Button
-                aria-label={active ? "Pause bomb timer" : "Resume bomb timer"}
-                onClick={() => setRunning((value) => !value)}
-                size="icon"
-                variant="secondary"
-              >
-                {active ? <Pause className="size-4" /> : <Play className="size-4" />}
-              </Button>
-            ) : null}
+            <Button
+              aria-label={active ? "Pause bomb timer" : "Resume bomb timer"}
+              onClick={() => setRunning((value) => !value)}
+              size="icon"
+              type="button"
+              variant="secondary"
+            >
+              {active ? <Pause className="size-4" /> : <Play className="size-4" />}
+            </Button>
             <Button
               aria-label="Re-roll bomb timer"
               onClick={resetTimer}
               size="icon"
+              type="button"
               variant="outline"
             >
               <RotateCcw className="size-4" />
             </Button>
           </div>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-secondary">
-          <div
-            className="h-full rounded-full bg-primary transition-[width] duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
         <p className="text-xs leading-5 text-muted-foreground">
-          {exploded
-            ? "Tap the player holding it below to add Beerits and continue."
-            : "Pass it around. The starting duration is randomly picked for this card."}
+          Pass it around. The duration is random for this card, so nobody —
+          not even the host — knows when it blows.
         </p>
       </CardContent>
     </Card>

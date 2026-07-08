@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { ActionState } from "@/lib/auth/action-state";
 import { getViewer } from "@/lib/auth/viewer";
+import { logDevelopmentError } from "@/lib/dev-log";
+import { describePostgrestError } from "@/lib/supabase/postgrest-error";
 import { createClient } from "@/lib/supabase/server";
 import {
   gameFormSchema,
@@ -86,10 +88,20 @@ export async function createGameAction(
     .single();
 
   if (gameError || !game) {
+    logDevelopmentError("Could not save the game.", gameError);
     return {
-      message: "Could not save the game. Please try again.",
+      message: describePostgrestError(
+        gameError,
+        "Could not save the game. Please try again.",
+      ),
       status: "error",
     };
+  }
+
+  if (values.cards.length === 0) {
+    revalidatePath("/browse");
+    revalidatePath(`/profile/${viewer.profile.username}`);
+    redirect(`/games/${game.id}`);
   }
 
   const { error: cardsError } = await supabase.from("game_cards").insert(
@@ -109,10 +121,14 @@ export async function createGameAction(
   );
 
   if (cardsError) {
+    logDevelopmentError("Could not save the game cards.", cardsError);
     await supabase.from("games").delete().eq("id", game.id);
 
     return {
-      message: "Could not save the game cards. Please try again.",
+      message: describePostgrestError(
+        cardsError,
+        "Could not save the game cards. Please try again.",
+      ),
       status: "error",
     };
   }

@@ -277,7 +277,6 @@ export function GameCardEditor({
               </Button>
               <Button
                 aria-label={`Remove card ${index + 1}`}
-                disabled={fields.length === 1}
                 onClick={() => remove(index)}
                 size="icon"
                 type="button"
