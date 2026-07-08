@@ -238,3 +238,75 @@ Status: completed.
 - Increase common tap targets and add touch feedback.
 - Make the post-game question contribution optional.
 - Add direct post-game actions for replay, Browse, and Home.
+
+## Milestone 13: Core stabilization, Bomb Mode, and dark redesign
+
+Goal: fix core creation bugs, make gameplay faster, and give the app a dark
+professional mobile look.
+
+Status: completed.
+
+- Surface actionable create-game and add-cards error messages instead of
+  generic failures.
+- Allow physical games (card, board, dice) without cards when rules exist.
+- Stop random discovery from locking lobbies to one equipment type unless the
+  player explicitly filtered on it.
+- Bomb Mode: auto-start hidden random timer (20-180 seconds), BOOM state with
+  micro-animation and optional haptics, intensity-based Beerits (Soft 1,
+  Funny 2, Spicy 3, Chaos 4), and instant advance after loser selection.
+- Move the scoreboard and chat into bottom sheets during active gameplay.
+- Dark mode as the default and only theme.
+- Home: Start random game as the primary action, join lobby and browse as
+  secondary, and an active-lobby jump-back-in card.
+- Waiting room: large tap-to-copy lobby code and a share-invite action.
+
+## Milestone 14: Random discovery filters
+
+Goal: make random game discovery powerful and fun.
+
+Status: completed.
+
+- Start random game opens a filter sheet with multi-select categories
+  (select all/unselect all), prompt/physical/both, intensities, player count,
+  duration, and ranking mode (Hot, Top, Recent, Most liked, Surprise me).
+- All filters are selected by default, with an "I don't care, surprise me"
+  action.
+- The pick_random_game RPC accepts multi-select category and intensity
+  arrays; likes and dislikes keep affecting pick probability.
+
+## Milestone 15: Contributions and session-only questions
+
+Goal: make it easy for players to add content during play.
+
+Status: completed.
+
+- Session-only custom questions live in lobby_session_questions: added during
+  a lobby, played at the end of the card stack, never saved to the cloud, no
+  Tokens, host or submitter can delete, realtime updates.
+- The in-game add-a-question sheet combines the session-only quick form with
+  the existing public community suggestion form.
+
+## Milestone 16: Friend Balance first version
+
+Goal: a fictional per-lobby group score inspired by balance apps, without
+money, debt, settlement, or alcohol.
+
+Status: completed (per-lobby summary).
+
+- Finished lobbies show zero-sum Balance Points from placement (5/3/1 base,
+  ties share slots, normalized so the group total is zero).
+- Copy states Friend Balance is a fictional friend-group score with no
+  monetary value and is not a debt.
+- No persistence, transfers, wagers, or settlement.
+
+## Milestone 17: Starter content wave 2
+
+Goal: broaden the template library with high-quality starter games.
+
+Status: completed (first wave of 8; library at 26 public games).
+
+- Pass the Bomb: Chaos Edition (Bomb Mode showcase), This or That: Party
+  Vote, Two Truths and a Lie, Hot Takes, Road Trip Rally, Mexen, Cup Flip
+  Relay (drinking never required), and Beerit Scorekeeper.
+- Moderation report reasons expanded with Harassment, Hate, Sexual
+  pressure/coercion, and Illegal activity.
