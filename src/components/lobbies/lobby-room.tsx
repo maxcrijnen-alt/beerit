@@ -52,6 +52,7 @@ import { Sheet } from "@/components/ui/sheet";
 import { withTimeout } from "@/lib/async/with-timeout";
 import { getViewerDisplayName } from "@/lib/auth/display-name";
 import { logDevelopmentError } from "@/lib/dev-log";
+import { calculateFriendBalance } from "@/lib/lobbies/friend-balance";
 import {
   fetchLobby,
   fetchLobbyMessages,
@@ -134,6 +135,8 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
     !isBombModeCard || !hasBombTimerRange || explodedBombCardId === currentCardId;
   const isHost = lobby.host_session_user_id === viewer.id;
   const onlineSet = new Set(onlineSessionIds);
+  const friendBalance =
+    lobby.status === "FINISHED" ? calculateFriendBalance(players) : [];
 
   const handleBombExplodedChange = useCallback(
     (exploded: boolean) => {
@@ -732,6 +735,51 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
               </p>
             </CardContent>
           </Card>
+          {friendBalance.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Friend Balance</CardTitle>
+                <CardDescription>
+                  Fictional group score for this lobby, based on placement.
+                  What one player gains, another loses — the group total is
+                  always zero.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {friendBalance.map((entry) => (
+                  <div
+                    className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
+                    key={entry.playerId}
+                  >
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="w-5 shrink-0 text-center font-mono text-sm text-muted-foreground">
+                        {entry.place}.
+                      </span>
+                      <p className="truncate text-sm font-semibold">
+                        {entry.displayName}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 font-mono text-sm font-semibold ${
+                        entry.balancePoints > 0
+                          ? "text-primary"
+                          : entry.balancePoints < 0
+                            ? "text-muted-foreground"
+                            : ""
+                      }`}
+                    >
+                      {entry.balancePoints > 0 ? "+" : ""}
+                      {entry.balancePoints} Balance Points
+                    </span>
+                  </div>
+                ))}
+                <p className="pt-1 text-xs leading-5 text-muted-foreground">
+                  Friend Balance is a fictional friend-group score. It has no
+                  monetary value and is not a debt.
+                </p>
+              </CardContent>
+            </Card>
+          ) : null}
           {isHost ? (
             <Button
               className="w-full"
