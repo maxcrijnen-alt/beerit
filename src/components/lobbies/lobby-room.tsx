@@ -365,6 +365,33 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
     }
   }
 
+  async function shareInvite() {
+    const inviteText = `Join my Beerit lobby with code ${lobby.code}: ${window.location.origin}/lobby`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ text: inviteText });
+        return;
+      }
+
+      await navigator.clipboard.writeText(inviteText);
+      setMutationFeedback({
+        message: "Invite copied. Send it to your group.",
+        tone: "success",
+      });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+
+      logDevelopmentError("Could not share the lobby invite.", error);
+      setMutationFeedback({
+        message: "Could not share the invite. Copy the code instead.",
+        tone: "error",
+      });
+    }
+  }
+
   const scoreboardBody = (
     <>
       {players.map((player) => (
@@ -494,8 +521,30 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
               the host as the only connected device.
             </CardDescription>
           </CardHeader>
-          {isHost ? (
-            <CardContent>
+          <CardContent className="space-y-3">
+            <button
+              className="w-full rounded-2xl border border-dashed border-primary/50 bg-primary/5 p-4 text-center transition hover:bg-primary/10"
+              onClick={copyCode}
+              type="button"
+            >
+              <p className="text-xs text-muted-foreground">Lobby code</p>
+              <p className="mt-1 font-mono text-4xl font-bold tracking-[0.3em]">
+                {lobby.code}
+              </p>
+              <p className="mt-1 text-xs text-primary">
+                {copied ? "Copied!" : "Tap to copy"}
+              </p>
+            </button>
+            <Button
+              className="w-full"
+              onClick={shareInvite}
+              type="button"
+              variant="outline"
+            >
+              <Send className="size-4" />
+              Share invite
+            </Button>
+            {isHost ? (
               <Button
                 className="w-full"
                 disabled={pending}
@@ -505,14 +554,12 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
                 <Play className="size-4" />
                 Start game
               </Button>
-            </CardContent>
-          ) : (
-            <CardContent>
+            ) : (
               <p className="text-sm text-muted-foreground">
                 Waiting for the host to start the game.
               </p>
-            </CardContent>
-          )}
+            )}
+          </CardContent>
         </Card>
       ) : null}
 

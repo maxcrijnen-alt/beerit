@@ -41,7 +41,9 @@ function requireSupabase(
 }
 
 function unavailableError(): ActionState {
-  return authError("Beerit could not reach sign-in services. Please try again.");
+  return authError(
+    "Beerit could not reach the sign-in service. The game database may be paused or waking up — try again in a minute.",
+  );
 }
 
 async function getCurrentClaims(
