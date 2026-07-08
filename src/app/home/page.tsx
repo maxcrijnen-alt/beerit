@@ -48,7 +48,7 @@ export default async function HomePage() {
           </Badge>
           <div className="space-y-2">
             <h1 className="text-4xl font-semibold tracking-[-0.04em]">
-              Start je avond, {name}.
+              Start your night, {name}.
             </h1>
             <p className="text-sm leading-6 text-muted-foreground">
               Pick a game, open a lobby, and play on one phone or across

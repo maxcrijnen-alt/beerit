@@ -836,7 +836,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
                 </div>
               ))}
               <p className="pt-1 text-xs text-muted-foreground leading-5">
-                Beerits zijn fictieve strafpunten. Geen schulden, geen geld, geen verrekening.
+                Beerits are fictional penalty points. No debts, no money, no settlement.
               </p>
             </CardContent>
           </Card>
@@ -935,7 +935,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
                 <UsersRound className="size-4 text-primary" />
                 <CardTitle>Scoreboard</CardTitle>
               </div>
-              <span className="text-xs text-muted-foreground">Fictieve Beerits</span>
+              <span className="text-xs text-muted-foreground">Fictional Beerits</span>
             </div>
           </CardHeader>
           <CardContent className="space-y-2">{scoreboardBody}</CardContent>
@@ -960,7 +960,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         title="Scoreboard"
       >
         <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">Fictieve Beerits</p>
+          <p className="text-xs text-muted-foreground">Fictional Beerits</p>
           {scoreboardBody}
         </div>
       </Sheet>
