@@ -15,6 +15,7 @@ import { AdPlaceholder } from "@/components/ad-placeholder";
 import { EmptyState } from "@/components/empty-state";
 import { GameCard } from "@/components/games/game-card";
 import { GameFilters } from "@/components/games/game-filters";
+import { RandomFilterSheet } from "@/components/games/random-filter-sheet";
 import { Button } from "@/components/ui/button";
 import {
   calculateGameScore,
@@ -25,6 +26,7 @@ import { buildRandomLobbyCreateHref } from "@/lib/lobbies/defaults";
 import { logDevelopmentError } from "@/lib/dev-log";
 import { useGameFiltersStore } from "@/stores/game-filters";
 import type { DiscoveryPool, GameCategory, GameSummary } from "@/types/database";
+import { GAME_CATEGORIES, GAME_INTENSITIES } from "@/types/database";
 
 interface GameBrowserProps {
   games: GameSummary[];
@@ -67,6 +69,7 @@ export function GameBrowser({ games }: GameBrowserProps) {
   const hasAppliedRandomIntent = useRef(false);
   const [isPickingRandom, setIsPickingRandom] = useState(false);
   const [randomMessage, setRandomMessage] = useState<string | null>(null);
+  const [randomSheetOpen, setRandomSheetOpen] = useState(false);
   const {
     addRecentRandomGameId,
     category,
@@ -76,9 +79,13 @@ export function GameBrowser({ games }: GameBrowserProps) {
     players,
     pool,
     query,
+    randomCategories,
+    randomIntensities,
     randomSeed,
     recentRandomGameIds,
     setPool,
+    setRandomCategories,
+    setRandomIntensities,
     setSort,
     sort,
   } = useGameFiltersStore();
@@ -93,6 +100,7 @@ export function GameBrowser({ games }: GameBrowserProps) {
     hasAppliedRandomIntent.current = true;
     setPool("SURPRISE");
     setSort("random");
+    setRandomSheetOpen(true);
   }, [searchParams, setPool, setSort]);
 
   const visibleGames = useMemo(() => {
@@ -163,12 +171,6 @@ export function GameBrowser({ games }: GameBrowserProps) {
       visibleGames.filter((game) => !recentRandomGameIds.includes(game.id)),
     [recentRandomGameIds, visibleGames],
   );
-  const pickLocalRandomGame = useCallback(() => {
-    const candidates =
-      freshRandomGames.length > 0 ? freshRandomGames : visibleGames;
-
-    return pickWeightedRandomGame(candidates, pool);
-  }, [freshRandomGames, pool, visibleGames]);
   const pushRandomLobby = useCallback(
     (game: Pick<GameSummary, "category" | "id">) => {
       addRecentRandomGameId(game.id);
@@ -182,20 +184,83 @@ export function GameBrowser({ games }: GameBrowserProps) {
     },
     [addRecentRandomGameId, category, contentMode, router],
   );
-  const handlePickRandom = useCallback(() => {
+  const handlePickRandom = useCallback((options?: { surprise: boolean }) => {
+    const surprise = options?.surprise ?? false;
+
+    if (surprise) {
+      setRandomCategories([...GAME_CATEGORIES]);
+      setRandomIntensities([...GAME_INTENSITIES]);
+      setPool("SURPRISE");
+    }
+
+    const pickPool = surprise ? "SURPRISE" : pool;
+    const pickCategories = surprise ? [] : randomCategories;
+    const pickIntensities = surprise ? [] : randomIntensities;
+    const pickContentMode = surprise ? "BOTH" : contentMode;
+    const pickPlayers = surprise ? null : players;
+    const pickDuration = surprise ? null : durationMaxMinutes;
+    const localCandidates = games.filter((game) => {
+      const isPhysical = isPhysicalGame(game);
+      const matchesContentMode =
+        pickContentMode === "BOTH" ||
+        (pickContentMode === "PHYSICAL" && isPhysical) ||
+        (pickContentMode === "DIGITAL" && !isPhysical);
+      const matchesDuration =
+        pickDuration === null ||
+        (game.estimated_duration !== null &&
+          game.estimated_duration <= pickDuration);
+      const matchesPlayers =
+        pickPlayers === null ||
+        (game.min_players <= pickPlayers &&
+          (game.max_players === null || game.max_players >= pickPlayers));
+
+      return (
+        (pickCategories.length === 0 ||
+          pickCategories.includes(game.category)) &&
+        (pickIntensities.length === 0 ||
+          pickIntensities.includes(game.intensity)) &&
+        matchesContentMode &&
+        matchesDuration &&
+        matchesPlayers
+      );
+    });
+    const pickLocalCandidate = () => {
+      const fresh = localCandidates.filter(
+        (game) => !recentRandomGameIds.includes(game.id),
+      );
+
+      return pickWeightedRandomGame(
+        fresh.length > 0 ? fresh : localCandidates,
+        pickPool,
+      );
+    };
+
+    setRandomSheetOpen(false);
     setIsPickingRandom(true);
     setRandomMessage(null);
 
     startTransition(async () => {
       try {
         const result = await pickRandomGameAction({
-          category,
-          contentMode,
-          durationMaxMinutes,
-          intensity,
-          players,
-          pool,
-          query,
+          categories:
+            pickCategories.length === GAME_CATEGORIES.length
+              ? undefined
+              : pickCategories.length > 0
+                ? pickCategories
+                : undefined,
+          category: surprise ? "ALL" : category,
+          contentMode: pickContentMode,
+          durationMaxMinutes: pickDuration,
+          intensities:
+            pickIntensities.length === GAME_INTENSITIES.length
+              ? undefined
+              : pickIntensities.length > 0
+                ? pickIntensities
+                : undefined,
+          intensity: surprise ? "ALL" : intensity,
+          players: pickPlayers,
+          pool: pickPool,
+          query: surprise ? "" : query,
           recentRandomGameIds,
         });
 
@@ -212,7 +277,7 @@ export function GameBrowser({ games }: GameBrowserProps) {
           return;
         }
 
-        const picked = pickLocalRandomGame();
+        const picked = pickLocalCandidate();
 
         if (!picked) {
           setRandomMessage(result.message);
@@ -223,7 +288,7 @@ export function GameBrowser({ games }: GameBrowserProps) {
         pushRandomLobby(picked);
       } catch (error) {
         logDevelopmentError("Could not pick a random game.", error);
-        const picked = pickLocalRandomGame();
+        const picked = pickLocalCandidate();
 
         if (!picked) {
           setRandomMessage("Could not pick a random game. Try fewer filters.");
@@ -242,13 +307,17 @@ export function GameBrowser({ games }: GameBrowserProps) {
     durationMaxMinutes,
     games,
     intensity,
-    pickLocalRandomGame,
     players,
     pool,
     pushRandomLobby,
     query,
+    randomCategories,
+    randomIntensities,
     recentRandomGameIds,
     router,
+    setPool,
+    setRandomCategories,
+    setRandomIntensities,
   ]);
 
 
@@ -272,11 +341,11 @@ export function GameBrowser({ games }: GameBrowserProps) {
           </div>
           <Button
             className="w-full"
-            disabled={visibleGames.length === 0 || isPickingRandom}
-            onClick={handlePickRandom}
+            disabled={isPickingRandom}
+            onClick={() => setRandomSheetOpen(true)}
           >
             <Shuffle className="size-4" />
-            {isPickingRandom ? "Picking..." : "Pick random game"}
+            {isPickingRandom ? "Picking..." : "Random from filters"}
           </Button>
           {randomMessage ? (
             <p
@@ -318,6 +387,12 @@ export function GameBrowser({ games }: GameBrowserProps) {
           ))}
         </div>
       )}
+      <RandomFilterSheet
+        onOpenChange={setRandomSheetOpen}
+        onStart={handlePickRandom}
+        open={randomSheetOpen}
+        pending={isPickingRandom}
+      />
     </div>
   );
 }

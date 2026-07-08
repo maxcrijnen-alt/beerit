@@ -147,11 +147,11 @@ export function GameForm({
             </p>
           </div>
           <p className="rounded-lg bg-secondary p-3 text-xs leading-5 text-muted-foreground">
-            Adding a physical card, board, or dice game? Choose its category,
-            then add an Activity card below and select the matching equipment
-            type. Public offline games can then appear in weighted random
-            offline lobbies. More likes increase their chance; dislikes reduce
-            it.
+            Adding a physical card, board, or dice game? Choose its category
+            and write clear rules — cards are optional for physical games. Add
+            an Activity card with the matching equipment type when you want the
+            game to appear in weighted random offline lobbies. More likes
+            increase that chance; dislikes reduce it.
           </p>
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-2">
@@ -238,10 +238,15 @@ export function GameForm({
         remove={cards.remove}
         setValue={form.setValue}
       />
-      {form.formState.errors.cards?.message ? (
+      {form.formState.errors.cards?.message ||
+      form.formState.errors.cards?.root?.message ? (
         <p className="text-sm text-destructive">
-          {form.formState.errors.cards.message}
+          {form.formState.errors.cards.message ??
+            form.formState.errors.cards.root?.message}
         </p>
+      ) : null}
+      {state.fieldErrors?.cards?.length ? (
+        <p className="text-sm text-destructive">{state.fieldErrors.cards[0]}</p>
       ) : null}
       {state.message ? (
         <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">

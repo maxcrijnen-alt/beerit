@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import type { ActionState } from "@/lib/auth/action-state";
 import { getViewer } from "@/lib/auth/viewer";
 import { logDevelopmentError } from "@/lib/dev-log";
+import { describePostgrestError } from "@/lib/supabase/postgrest-error";
 import { createClient } from "@/lib/supabase/server";
 import {
   addGameCardsSchema,
@@ -129,7 +130,10 @@ export async function addGameCardsAction(
   } catch (error) {
     logDevelopmentError("Could not add cards to the game.", error);
     return {
-      message: "Could not add the cards. Please try again.",
+      message: describePostgrestError(
+        error as { code?: string; message?: string },
+        "Could not add the cards. Please try again.",
+      ),
       status: "error",
     };
   }

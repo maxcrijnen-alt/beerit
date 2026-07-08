@@ -58,14 +58,20 @@ export function buildRandomLobbyCreateHref({
   game,
 }: RandomLobbyHrefOptions) {
   const params = new URLSearchParams({ fromRandom: "1" });
-  const activityKind =
-    categoryFilter !== "ALL"
-      ? getActivityKindForCategory(categoryFilter)
-      : getActivityKindForCategory(game.category);
+  const explicitActivityKind =
+    categoryFilter !== "ALL" ? getActivityKindForCategory(categoryFilter) : null;
+  const baseActivityKind = getActivityKindForCategory(game.category);
 
-  if (activityKind) {
+  if (explicitActivityKind) {
+    // The player explicitly filtered on one physical category, so an
+    // offline-only lobby with that equipment is what they asked for.
     params.set("activitySelectionMode", "ONLY_SELECTED");
-    params.append("activityKinds", activityKind);
+    params.append("activityKinds", explicitActivityKind);
+  } else if (baseActivityKind) {
+    // Random landed on a physical game without an explicit filter: keep the
+    // normal mix so the lobby is not restricted to one equipment type.
+    params.set("activitySelectionMode", "MIXED");
+    params.append("activityKinds", baseActivityKind);
   } else if (contentMode === "DIGITAL") {
     params.set("activitySelectionMode", "MIXED");
   }

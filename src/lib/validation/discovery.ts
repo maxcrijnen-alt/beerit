@@ -7,9 +7,13 @@ import {
 } from "@/types/database";
 
 export const pickRandomGameSchema = z.object({
+  // Multi-select filters from the random filter sheet. When present they take
+  // precedence over the single-value category/intensity browse filters.
+  categories: z.array(z.enum(GAME_CATEGORIES)).max(15).optional(),
   category: z.enum(["ALL", ...GAME_CATEGORIES]),
   contentMode: z.enum(DISCOVERY_CONTENT_MODES),
   durationMaxMinutes: z.number().int().min(1).max(240).nullable(),
+  intensities: z.array(z.enum(GAME_INTENSITIES)).max(4).optional(),
   intensity: z.enum(["ALL", ...GAME_INTENSITIES]),
   players: z.number().int().min(1).max(100).nullable(),
   pool: z.enum(DISCOVERY_POOLS),

@@ -6,6 +6,7 @@ import type {
   LobbyMessage,
   LobbyPlayer,
   LobbyRoomData,
+  LobbySessionQuestion,
   LobbySummary,
 } from "@/types/database";
 
@@ -70,8 +71,13 @@ export async function fetchLobbyRoom(id: string): Promise<LobbyRoomData | null> 
     return null;
   }
 
-  const [gameResult, cardsResult, playersResult, messagesResult] =
-    await Promise.all([
+  const [
+    gameResult,
+    cardsResult,
+    playersResult,
+    messagesResult,
+    sessionQuestionsResult,
+  ] = await Promise.all([
       supabase
         .from("games")
         .select("id, rules, title")
@@ -93,6 +99,12 @@ export async function fetchLobbyRoom(id: string): Promise<LobbyRoomData | null> 
         .eq("lobby_id", lobby.id)
         .order("created_at", { ascending: true })
         .limit(50),
+      supabase
+        .from("lobby_session_questions")
+        .select("*")
+        .eq("lobby_id", lobby.id)
+        .order("created_at", { ascending: true })
+        .order("id", { ascending: true }),
     ]);
 
   if (gameResult.error) {
@@ -109,6 +121,12 @@ export async function fetchLobbyRoom(id: string): Promise<LobbyRoomData | null> 
 
   if (messagesResult.error) {
     throw new Error(`Could not fetch lobby chat: ${messagesResult.error.message}`);
+  }
+
+  if (sessionQuestionsResult.error) {
+    throw new Error(
+      `Could not fetch session questions: ${sessionQuestionsResult.error.message}`,
+    );
   }
 
   const cards = (cardsResult.data as unknown as LobbyCardRow[]).flatMap(
@@ -136,5 +154,6 @@ export async function fetchLobbyRoom(id: string): Promise<LobbyRoomData | null> 
     lobby,
     messages: messagesResult.data as LobbyMessage[],
     players: playersResult.data as LobbyPlayer[],
+    session_questions: sessionQuestionsResult.data as LobbySessionQuestion[],
   };
 }

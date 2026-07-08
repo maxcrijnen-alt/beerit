@@ -8,6 +8,7 @@ import type {
   GameCategory,
   GameIntensity,
 } from "@/types/database";
+import { GAME_CATEGORIES, GAME_INTENSITIES } from "@/types/database";
 
 export type { DiscoveryContentMode };
 export type GameSort = "liked" | "new" | "random" | "top" | "trending";
@@ -24,10 +25,14 @@ interface GameFiltersState {
   pool: DiscoveryPool;
   players: number | null;
   query: string;
+  randomCategories: GameCategory[];
+  randomIntensities: GameIntensity[];
   randomSeed: number;
   recentRandomGameIds: string[];
   reset: () => void;
   setCategory: (category: GameCategory | "ALL") => void;
+  setRandomCategories: (randomCategories: GameCategory[]) => void;
+  setRandomIntensities: (randomIntensities: GameIntensity[]) => void;
   setContentMode: (contentMode: DiscoveryContentMode) => void;
   setDurationMaxMinutes: (durationMaxMinutes: number | null) => void;
   setIntensity: (intensity: GameIntensity | "ALL") => void;
@@ -46,6 +51,9 @@ const initialFilters = {
   pool: "HOT" as const,
   players: null,
   query: "",
+  // All filters selected by default: random discovery starts wide open.
+  randomCategories: [...GAME_CATEGORIES],
+  randomIntensities: [...GAME_INTENSITIES],
   sort: "trending" as const,
 };
 
@@ -65,6 +73,8 @@ export const useGameFiltersStore = create<GameFiltersState>()(
       clearRecentRandomGameIds: () => set({ recentRandomGameIds: [] }),
       reset: () => set({ ...initialFilters, randomSeed: Date.now() }),
       setCategory: (category) => set({ category }),
+      setRandomCategories: (randomCategories) => set({ randomCategories }),
+      setRandomIntensities: (randomIntensities) => set({ randomIntensities }),
       setContentMode: (contentMode) => set({ contentMode }),
       setDurationMaxMinutes: (durationMaxMinutes) => set({ durationMaxMinutes }),
       setIntensity: (intensity) => set({ intensity }),

@@ -93,11 +93,16 @@ export const updateGameConceptSchema = z.object({
   gameId: z.string().uuid(),
 });
 
+export const PHYSICAL_GAME_CATEGORIES = [
+  "Card Games",
+  "Board Games",
+  "Dice Games",
+] as const;
+
 export const gameFormSchema = z
   .object({
     cards: z
       .array(gameEditorCardSchema)
-      .min(1, "Add at least one card.")
       .max(100, "Use at most 100 cards in the MVP."),
     category: z.enum(GAME_CATEGORIES),
     concept: z.string().trim().max(120, "Use at most 120 characters."),
@@ -120,6 +125,34 @@ export const gameFormSchema = z
   .refine((values) => values.maxPlayers >= values.minPlayers, {
     message: "Maximum players must be at least the minimum.",
     path: ["maxPlayers"],
+  })
+  .superRefine((values, context) => {
+    if (values.cards.length > 0) {
+      return;
+    }
+
+    const isPhysicalCategory = (
+      PHYSICAL_GAME_CATEGORIES as readonly string[]
+    ).includes(values.category);
+
+    if (!isPhysicalCategory) {
+      context.addIssue({
+        code: "custom",
+        message:
+          "This game type is played with prompt cards. Add at least one card.",
+        path: ["cards"],
+      });
+      return;
+    }
+
+    if (!values.rules.trim()) {
+      context.addIssue({
+        code: "custom",
+        message:
+          "A physical game without cards needs rules so players know how to play. Add rules or at least one Activity card.",
+        path: ["cards"],
+      });
+    }
   });
 
 export type GameFormValues = z.infer<typeof gameFormSchema>;

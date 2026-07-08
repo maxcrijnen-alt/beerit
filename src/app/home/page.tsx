@@ -21,13 +21,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { requireViewer } from "@/lib/auth/require-viewer";
+import { fetchViewerLobbies } from "@/lib/lobbies/queries";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const viewer = await requireViewer();
+  const [viewer, lobbies] = await Promise.all([
+    requireViewer(),
+    fetchViewerLobbies().catch(() => []),
+  ]);
   const name = viewer.profile?.username ?? viewer.guestName ?? "friend";
+  const activeLobby =
+    lobbies.find((lobby) => lobby.status === "ACTIVE") ??
+    lobbies.find((lobby) => lobby.status === "WAITING") ??
+    null;
 
   return (
     <AppShell viewer={viewer}>
@@ -53,7 +61,7 @@ export default async function HomePage() {
               href="/browse?intent=random"
             >
               <Shuffle className="size-4" />
-              Pick random game
+              Start random game
               <ArrowRight className="ml-auto size-4" />
             </Link>
             <div className="grid grid-cols-2 gap-3">
@@ -62,25 +70,49 @@ export default async function HomePage() {
                   buttonVariants({ size: "lg", variant: "outline" }),
                   "w-full",
                 )}
-                href="/browse"
+                href="/lobby"
               >
-                <Search className="size-4" />
-                Browse
+                <Gamepad2 className="size-4" />
+                Join lobby
               </Link>
               <Link
                 className={cn(
                   buttonVariants({ size: "lg", variant: "outline" }),
                   "w-full",
                 )}
-                href="/lobby"
+                href="/browse"
               >
-                <Gamepad2 className="size-4" />
-                Lobby
+                <Search className="size-4" />
+                Browse games
               </Link>
             </div>
           </div>
         </div>
       </section>
+      {activeLobby ? (
+        <section className="mt-4">
+          <Link href={`/lobby/${activeLobby.id}`}>
+            <Card className="border-primary/40 bg-primary/5 transition hover:border-primary/70">
+              <CardContent className="flex items-center justify-between gap-3 p-4">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-primary">
+                    {activeLobby.status === "ACTIVE"
+                      ? "Game in progress — jump back in"
+                      : "Your lobby is waiting"}
+                  </p>
+                  <p className="mt-1 truncate text-sm font-semibold">
+                    {activeLobby.game_title}
+                  </p>
+                  <p className="mt-0.5 font-mono text-xs tracking-widest text-muted-foreground">
+                    {activeLobby.code}
+                  </p>
+                </div>
+                <ArrowRight className="size-5 shrink-0 text-primary" />
+              </CardContent>
+            </Card>
+          </Link>
+        </section>
+      ) : null}
       <section className="mt-6 grid gap-3 sm:grid-cols-2">
         <Card>
           <CardHeader>

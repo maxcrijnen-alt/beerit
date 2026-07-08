@@ -40,10 +40,13 @@ interface GameVoteButtonsProps {
 
 const REPORT_REASON_LABELS: Record<(typeof GAME_REPORT_REASONS)[number], string> = {
   DANGEROUS_CHALLENGE: "Dangerous challenge",
-  HATE_HARASSMENT: "Hate or harassment",
+  HARASSMENT: "Harassment",
+  HATE: "Hate",
+  ILLEGAL_ACTIVITY: "Illegal activity",
   OTHER: "Other",
   REAL_GAMBLING: "Real gambling",
   SELF_HARM: "Self-harm",
+  SEXUAL_COERCION: "Sexual pressure or coercion",
   SPAM: "Spam",
   UNDERAGE_DRINKING: "Underage drinking",
 };
