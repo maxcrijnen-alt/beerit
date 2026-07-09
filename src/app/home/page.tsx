@@ -39,7 +39,7 @@ export default async function HomePage() {
 
   return (
     <AppShell viewer={viewer}>
-      <section className="relative overflow-hidden rounded-[2rem] border border-border/80 bg-card p-5 shadow-[0_20px_55px_rgba(48,34,18,0.10)]">
+      <section className="relative overflow-hidden rounded-[2rem] border border-border/80 bg-card p-5 shadow-[0_20px_55px_rgba(0,0,0,0.40)]">
         <div className="absolute -right-16 -top-20 size-44 rounded-full bg-primary/15 blur-3xl" />
         <div className="absolute -bottom-24 left-6 size-40 rounded-full bg-accent/70 blur-3xl" />
         <div className="relative space-y-3">
@@ -48,7 +48,7 @@ export default async function HomePage() {
           </Badge>
           <div className="space-y-2">
             <h1 className="text-4xl font-semibold tracking-[-0.04em]">
-              Start je avond, {name}.
+              Start your night, {name}.
             </h1>
             <p className="text-sm leading-6 text-muted-foreground">
               Zet in minder dan een minuut je groep, spullen en vibe klaar. Beerit kiest een passende lobby voor one-phone play of meerdere devices.
@@ -129,17 +129,18 @@ export default async function HomePage() {
             <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <PlusCircle className="size-5" />
             </span>
-            <CardTitle>Create games</CardTitle>
+            <CardTitle>Add your ideas</CardTitle>
             <CardDescription>
-              Publish your own party game or remix a community favorite.
+              Suggest questions for any game — guests included — or publish
+              your own game. Player votes decide what shows up more often.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link
               className={cn(buttonVariants({ variant: "secondary" }), "w-full")}
-              href="/create"
+              href="/contribute"
             >
-              {viewer.isAnonymous ? "Create an account first" : "Create a game"}
+              Add a question or game
             </Link>
           </CardContent>
         </Card>

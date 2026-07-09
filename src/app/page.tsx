@@ -27,7 +27,7 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen px-4 py-8 text-foreground">
       <div className="mx-auto max-w-xl space-y-6">
-        <section className="relative overflow-hidden rounded-[2rem] border border-border/80 bg-card p-6 shadow-[0_22px_60px_rgba(48,34,18,0.10)]">
+        <section className="relative overflow-hidden rounded-[2rem] border border-border/80 bg-card p-6 shadow-[0_22px_60px_rgba(0,0,0,0.40)]">
           <div className="absolute -right-14 -top-16 size-44 rounded-full bg-primary/20 blur-3xl" />
           <div className="absolute -bottom-24 left-8 size-44 rounded-full bg-accent/80 blur-3xl" />
           <div className="relative space-y-5">

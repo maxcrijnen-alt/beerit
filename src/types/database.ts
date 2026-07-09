@@ -217,6 +217,7 @@ export type LobbyControl = (typeof LOBBY_CONTROLS)[number];
 export interface Lobby {
   activity_kinds: GameActivityKind[];
   activity_selection_mode: LobbyActivitySelectionMode;
+  balance_weight: number;
   code: string;
   created_at: string;
   current_card_index: number;
@@ -285,11 +286,13 @@ export interface LobbyRoomData {
 
 export interface FriendStanding {
   direction: "INCOMING" | "OUTGOING";
+  friend_balance_points: number;
   friend_beerits: number;
   friend_id: string;
   friend_username: string;
   friendship_id: string;
   shared_lobbies: number;
   status: "ACCEPTED" | "PENDING";
+  your_balance_points: number;
   your_beerits: number;
 }

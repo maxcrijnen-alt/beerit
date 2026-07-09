@@ -21,6 +21,7 @@ const PLACEMENT_BASE_POINTS = [5, 3, 1];
  */
 export function calculateFriendBalance(
   players: LobbyPlayer[],
+  balanceWeight = 1,
 ): FriendBalanceEntry[] {
   if (players.length < 2) {
     return [];
@@ -64,7 +65,8 @@ export function calculateFriendBalance(
     const raw = rawPoints.get(player.id) ?? { base: 0, place: sorted.length };
 
     return {
-      balancePoints: Math.round((raw.base - average) * 10) / 10,
+      balancePoints:
+        Math.round((raw.base - average) * balanceWeight * 10) / 10,
       beerits: player.beerits,
       displayName: player.display_name,
       place: raw.place,

@@ -48,7 +48,7 @@ export function PostGameActions({ gameId }: PostGameActionsProps) {
           href="/home"
         >
           <DoorOpen className="size-4" />
-          Stop de avond
+          End the night
         </Link>
       </div>
 

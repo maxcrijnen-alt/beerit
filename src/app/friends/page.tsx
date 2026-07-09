@@ -1,6 +1,7 @@
 import { Check, LockKeyhole, Trophy, UserRound, UsersRound, X } from "lucide-react";
 import Link from "next/link";
 import {
+  markFriendBalanceEvenAction,
   removeFriendshipAction,
   respondFriendRequestAction,
 } from "@/app/friends/actions";
@@ -29,7 +30,14 @@ interface FriendsPageProps {
 }
 
 function getBalancePoints(friend: FriendStanding) {
-  return friend.friend_beerits - friend.your_beerits;
+  // Placement-based zero-sum Balance Points from finished lobbies (computed
+  // server-side, multiplied by each lobby's host-set balance weight);
+  // positive means the viewer is ahead of this friend.
+  return (
+    Math.round(
+      (friend.your_balance_points - friend.friend_balance_points) * 10,
+    ) / 10
+  );
 }
 
 function getBalanceStatus(points: number, otherLabel: string) {
@@ -274,6 +282,28 @@ function FriendBalancePanel({ friends }: { friends: FriendStanding[] }) {
                       {status.description}
                     </p>
                   </div>
+                  <form action={markFriendBalanceEvenAction}>
+                    <input
+                      name="friendshipId"
+                      type="hidden"
+                      value={friend.friendship_id}
+                    />
+                    <Button
+                      className="w-full"
+                      size="sm"
+                      type="submit"
+                      variant="outline"
+                    >
+                      Mark as even
+                    </Button>
+                  </form>
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    Friend Balance is een fictieve vriendengroep-score zonder
+                    geldwaarde en zonder schuld. De host kiest per lobby een
+                    avondgewicht (×0 t/m ×3) dat bepaalt hoeveel de avond
+                    meetelt, en Mark as even reset de stand voor jullie
+                    allebei.
+                  </p>
                 </CardContent>
               </Card>
             );

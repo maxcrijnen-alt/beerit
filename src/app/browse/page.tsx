@@ -1,4 +1,4 @@
-import { CircleAlert, RotateCcw } from "lucide-react";
+import { CircleAlert, PlusCircle, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/app-shell";
@@ -6,6 +6,7 @@ import { GameBrowser } from "@/components/games/game-browser";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchGames } from "@/lib/games/queries";
+import { fetchViewerGameVotes } from "@/lib/social/queries";
 import { getViewer } from "@/lib/auth/viewer";
 import { logDevelopmentError } from "@/lib/dev-log";
 import { cn } from "@/lib/utils";
@@ -83,6 +84,10 @@ function BrowseLayout({
 
 export default async function BrowsePage() {
   const [viewer, gamesResult] = await Promise.all([getViewer(), getBrowseGames()]);
+  const viewerVotes = await fetchViewerGameVotes(viewer).catch((error) => {
+    logDevelopmentError("Could not load viewer votes for browse.", error);
+    return {};
+  });
 
   if (gamesResult.hasError) {
     return (
@@ -94,15 +99,26 @@ export default async function BrowsePage() {
 
   const content = (
     <div className="space-y-4">
-      <div className="rounded-[1.5rem] border border-border/80 bg-card p-5 shadow-[0_16px_45px_rgba(48,34,18,0.08)]">
+      <div className="rounded-[1.5rem] border border-border/80 bg-card p-5 shadow-[0_16px_45px_rgba(0,0,0,0.35)]">
         <h1 className="text-3xl font-semibold tracking-[-0.04em]">
           Browse games
         </h1>
         <p className="mt-1 text-sm leading-5 text-muted-foreground">
           Find a game for your group and start a lobby when you are ready.
         </p>
+        <Link
+          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary"
+          href="/contribute"
+        >
+          <PlusCircle className="size-4" />
+          Add your own question or game
+        </Link>
       </div>
-      <GameBrowser games={gamesResult.games} />
+      <GameBrowser
+        canVote={Boolean(viewer)}
+        games={gamesResult.games}
+        viewerVotes={viewerVotes}
+      />
     </div>
   );
 

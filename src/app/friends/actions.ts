@@ -6,6 +6,7 @@ import { getViewer } from "@/lib/auth/viewer";
 import { logDevelopmentError } from "@/lib/dev-log";
 import { createClient } from "@/lib/supabase/server";
 import {
+  markFriendBalanceEvenSchema,
   removeFriendshipSchema,
   respondFriendRequestSchema,
   sendFriendRequestSchema,
@@ -65,6 +66,28 @@ export async function respondFriendRequestAction(formData: FormData) {
 
   if (error) {
     logDevelopmentError("Could not respond to a friend request.", error);
+    return;
+  }
+
+  revalidatePath("/friends");
+}
+
+export async function markFriendBalanceEvenAction(formData: FormData) {
+  const parsed = markFriendBalanceEvenSchema.safeParse(
+    Object.fromEntries(formData),
+  );
+  const actor = await getRegisteredActor();
+
+  if (!parsed.success || !actor) {
+    return;
+  }
+
+  const { error } = await actor.supabase.rpc("mark_friend_balance_even", {
+    p_friendship_id: parsed.data.friendshipId,
+  });
+
+  if (error) {
+    logDevelopmentError("Could not reset the fictional balance.", error);
     return;
   }
 

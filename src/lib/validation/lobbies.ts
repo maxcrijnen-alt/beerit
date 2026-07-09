@@ -62,6 +62,11 @@ export const leaveLobbySchema = z.object({
   lobbyId: z.string().uuid(),
 });
 
+export const setBalanceWeightSchema = z.object({
+  lobbyId: z.string().uuid(),
+  weight: z.coerce.number().int().min(0).max(3),
+});
+
 export const addSessionQuestionSchema = z.object({
   intensity: z.enum(["Soft", "Funny", "Spicy", "Chaos"]),
   lobbyId: z.string().uuid(),

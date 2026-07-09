@@ -53,7 +53,7 @@ export function GameFilters() {
   const quickCategories = ["Card Games", "Board Games", "Dice Games"] as const;
 
   return (
-    <div className="space-y-3 rounded-2xl border border-border/80 bg-card p-4 shadow-[0_14px_40px_rgba(48,34,18,0.07)] backdrop-blur">
+    <div className="space-y-3 rounded-2xl border border-border/80 bg-card p-4 shadow-[0_14px_40px_rgba(0,0,0,0.32)] backdrop-blur">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <span className="flex size-8 items-center justify-center rounded-xl bg-primary/10 text-primary">

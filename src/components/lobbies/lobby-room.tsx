@@ -32,6 +32,7 @@ import {
   leaveLobbyAction,
   scoreAndAdvanceLobbyAction,
   sendLobbyMessageAction,
+  setLobbyBalanceWeightAction,
   undoLastQuickResultAction,
 } from "@/app/lobby/actions";
 import { CommunityQuestionForm } from "@/components/games/community-question-form";
@@ -194,7 +195,9 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
   const isHost = lobby.host_session_user_id === viewer.id;
   const onlineSet = new Set(onlineSessionIds);
   const friendBalance =
-    lobby.status === "FINISHED" ? calculateFriendBalance(players) : [];
+    lobby.status === "FINISHED"
+      ? calculateFriendBalance(players, lobby.balance_weight ?? 1)
+      : [];
 
   const handleBombExplodedChange = useCallback(
     (exploded: boolean) => {
@@ -446,6 +449,14 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
     runMutation(sendLobbyMessageAction, formData, () => setDraft(""));
   }
 
+  function setBalanceWeight(weight: number) {
+    const formData = new FormData();
+
+    formData.set("lobbyId", lobbyId);
+    formData.set("weight", String(weight));
+    runMutation(setLobbyBalanceWeightAction, formData);
+  }
+
   function leaveLobby() {
     const formData = new FormData();
 
@@ -646,6 +657,38 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
               <Send className="size-4" />
               Share invite
             </Button>
+            <div className="space-y-2 rounded-2xl border border-border p-3">
+              <p className="text-sm font-medium">Friend Balance weight</p>
+              <p className="text-xs leading-5 text-muted-foreground">
+                How much tonight counts for the fictional Friend Balance.
+                ×0 is a casual lobby that never touches the balance.
+              </p>
+              {isHost ? (
+                <div className="grid grid-cols-4 gap-2">
+                  {[0, 1, 2, 3].map((weight) => (
+                    <Button
+                      aria-pressed={lobby.balance_weight === weight}
+                      disabled={pending}
+                      key={weight}
+                      onClick={() => setBalanceWeight(weight)}
+                      size="sm"
+                      type="button"
+                      variant={
+                        lobby.balance_weight === weight
+                          ? "default"
+                          : "outline"
+                      }
+                    >
+                      ×{weight}
+                    </Button>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm font-semibold">
+                  ×{lobby.balance_weight}
+                </p>
+              )}
+            </div>
             {isHost ? (
               <Button
                 className="w-full"
@@ -841,18 +884,20 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
                 </div>
               ))}
               <p className="pt-1 text-xs text-muted-foreground leading-5">
-                Beerits zijn fictieve strafpunten. Geen schulden, geen geld, geen verrekening.
+                Beerits are fictional penalty points. No debts, no money, no settlement.
               </p>
             </CardContent>
           </Card>
           {friendBalance.length > 0 ? (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Friend Balance</CardTitle>
+                <CardTitle className="text-base">
+                  Friend Balance ×{lobby.balance_weight ?? 1}
+                </CardTitle>
                 <CardDescription>
-                  Fictional group score for this lobby, based on placement.
-                  What one player gains, another loses — the group total is
-                  always zero.
+                  {(lobby.balance_weight ?? 1) === 0
+                    ? "Casual lobby: tonight does not count for the fictional Friend Balance."
+                    : "Fictional group score for this lobby, based on placement and the host-set weight. What one player gains, another loses — the group total is always zero."}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
@@ -940,7 +985,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
                 <UsersRound className="size-4 text-primary" />
                 <CardTitle>Scoreboard</CardTitle>
               </div>
-              <span className="text-xs text-muted-foreground">Fictieve Beerits</span>
+              <span className="text-xs text-muted-foreground">Fictional Beerits</span>
             </div>
           </CardHeader>
           <CardContent className="space-y-2">{scoreboardBody}</CardContent>
@@ -965,7 +1010,7 @@ export function LobbyRoom({ initialRoom, viewer }: LobbyRoomProps) {
         title="Scoreboard"
       >
         <div className="space-y-2">
-          <p className="text-xs text-muted-foreground">Fictieve Beerits</p>
+          <p className="text-xs text-muted-foreground">Fictional Beerits</p>
           {scoreboardBody}
         </div>
       </Sheet>

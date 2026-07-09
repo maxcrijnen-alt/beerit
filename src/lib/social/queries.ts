@@ -32,6 +32,35 @@ const EMPTY_SOCIAL_STATE: GameSocialState = {
   vote: null,
 };
 
+export async function fetchViewerGameVotes(
+  viewer: Viewer | null,
+): Promise<Record<string, GameVoteType>> {
+  if (!viewer) {
+    return {};
+  }
+
+  const supabase = await createClient();
+
+  if (!supabase) {
+    return {};
+  }
+
+  const { data, error } = await supabase
+    .from("game_votes")
+    .select("game_id, vote_type")
+    .eq("actor_session_user_id", viewer.id);
+
+  if (error) {
+    throw new Error(`Could not fetch your votes: ${error.message}`);
+  }
+
+  return Object.fromEntries(
+    (data as Array<{ game_id: string; vote_type: GameVoteType }>).map(
+      (vote) => [vote.game_id, vote.vote_type],
+    ),
+  );
+}
+
 export async function fetchGameSocialState(
   gameId: string,
   viewer: Viewer | null,

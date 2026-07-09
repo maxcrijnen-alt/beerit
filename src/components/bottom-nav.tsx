@@ -31,7 +31,7 @@ export function BottomNav({ profileHref }: BottomNavProps) {
 
   return (
     <nav className="fixed inset-x-0 bottom-3 z-20 px-3 pb-[env(safe-area-inset-bottom)]">
-      <div className="mx-auto grid max-w-xl grid-cols-5 rounded-[1.35rem] border border-border/80 bg-background/85 p-1 shadow-[0_18px_48px_rgba(48,34,18,0.16)] backdrop-blur-xl">
+      <div className="mx-auto grid max-w-xl grid-cols-5 rounded-[1.35rem] border border-border/80 bg-background/85 p-1 shadow-[0_18px_48px_rgba(0,0,0,0.50)] backdrop-blur-xl">
         {navItems.map(({ href, icon: Icon, label }) => {
           const active =
             pathname === href || (href !== "/home" && pathname.startsWith(href));
