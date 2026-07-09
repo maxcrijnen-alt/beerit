@@ -129,17 +129,18 @@ export default async function HomePage() {
             <span className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <PlusCircle className="size-5" />
             </span>
-            <CardTitle>Create games</CardTitle>
+            <CardTitle>Add your ideas</CardTitle>
             <CardDescription>
-              Publish your own party game or remix a community favorite.
+              Suggest questions for any game — guests included — or publish
+              your own game. Player votes decide what shows up more often.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link
               className={cn(buttonVariants({ variant: "secondary" }), "w-full")}
-              href="/create"
+              href="/contribute"
             >
-              {viewer.isAnonymous ? "Create an account first" : "Create a game"}
+              Add a question or game
             </Link>
           </CardContent>
         </Card>

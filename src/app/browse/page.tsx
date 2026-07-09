@@ -1,4 +1,4 @@
-import { CircleAlert, RotateCcw } from "lucide-react";
+import { CircleAlert, PlusCircle, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/app-shell";
@@ -106,6 +106,13 @@ export default async function BrowsePage() {
         <p className="mt-1 text-sm leading-5 text-muted-foreground">
           Find a game for your group and start a lobby when you are ready.
         </p>
+        <Link
+          className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary"
+          href="/contribute"
+        >
+          <PlusCircle className="size-4" />
+          Add your own question or game
+        </Link>
       </div>
       <GameBrowser
         canVote={Boolean(viewer)}
