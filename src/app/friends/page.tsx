@@ -29,13 +29,21 @@ interface FriendsPageProps {
   searchParams: Promise<{ tab?: string }>;
 }
 
+// The fictional balance is capped so it never grows into anything that feels
+// like a real tab or debt. Mark as even resets it at any time.
+const BALANCE_POINTS_CAP = 10;
+
 function getBalancePoints(friend: FriendStanding) {
   // Placement-based zero-sum Balance Points from finished lobbies (computed
   // server-side); positive means the viewer is ahead of this friend.
-  return (
+  const differential =
     Math.round(
       (friend.your_balance_points - friend.friend_balance_points) * 10,
-    ) / 10
+    ) / 10;
+
+  return Math.max(
+    -BALANCE_POINTS_CAP,
+    Math.min(BALANCE_POINTS_CAP, differential),
   );
 }
 
@@ -298,8 +306,9 @@ function FriendBalancePanel({ friends }: { friends: FriendStanding[] }) {
                   </form>
                   <p className="text-xs leading-5 text-muted-foreground">
                     Friend Balance is een fictieve vriendengroep-score zonder
-                    geldwaarde en zonder schuld. Mark as even reset de stand
-                    voor jullie allebei.
+                    geldwaarde en zonder schuld. De stand telt maximaal tot ±
+                    {BALANCE_POINTS_CAP} en Mark as even reset hem voor jullie
+                    allebei.
                   </p>
                 </CardContent>
               </Card>
