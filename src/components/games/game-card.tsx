@@ -16,14 +16,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { QuickVoteButtons } from "@/components/games/quick-vote-buttons";
 import { cn } from "@/lib/utils";
-import type { GameSummary } from "@/types/database";
+import type { GameSummary, GameVoteType } from "@/types/database";
 
 interface GameCardProps {
+  canVote?: boolean;
   game: GameSummary;
+  initialVote?: GameVoteType | null;
 }
 
-export function GameCard({ game }: GameCardProps) {
+export function GameCard({
+  canVote = false,
+  game,
+  initialVote = null,
+}: GameCardProps) {
   const playerRange = game.max_players
     ? `${game.min_players}-${game.max_players}`
     : `${game.min_players}+`;
@@ -59,16 +66,29 @@ export function GameCard({ game }: GameCardProps) {
             {game.plays_count}
           </span>
         </div>
-        <div className="flex gap-4 px-1 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <Heart className="size-3.5" />
-            {game.likes_count}
+        <div className="flex items-center justify-between gap-3 px-1">
+          {canVote ? (
+            <QuickVoteButtons
+              dislikes={game.dislikes_count}
+              gameId={game.id}
+              initialVote={initialVote}
+              likes={game.likes_count}
+            />
+          ) : (
+            <div className="flex gap-4 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Heart className="size-3.5" />
+                {game.likes_count}
+              </span>
+              <span className="flex items-center gap-1">
+                <ThumbsDown className="size-3.5" />
+                {game.dislikes_count}
+              </span>
+            </div>
+          )}
+          <span className="text-xs text-muted-foreground">
+            {game.cards_count} cards
           </span>
-          <span className="flex items-center gap-1">
-            <ThumbsDown className="size-3.5" />
-            {game.dislikes_count}
-          </span>
-          <span>{game.cards_count} cards</span>
         </div>
       </CardContent>
       <CardFooter className="grid grid-cols-2 gap-2">

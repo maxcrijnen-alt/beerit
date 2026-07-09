@@ -25,11 +25,18 @@ import {
 import { buildRandomLobbyCreateHref } from "@/lib/lobbies/defaults";
 import { logDevelopmentError } from "@/lib/dev-log";
 import { useGameFiltersStore } from "@/stores/game-filters";
-import type { DiscoveryPool, GameCategory, GameSummary } from "@/types/database";
+import type {
+  DiscoveryPool,
+  GameCategory,
+  GameSummary,
+  GameVoteType,
+} from "@/types/database";
 import { GAME_CATEGORIES, GAME_INTENSITIES } from "@/types/database";
 
 interface GameBrowserProps {
+  canVote?: boolean;
   games: GameSummary[];
+  viewerVotes?: Record<string, GameVoteType>;
 }
 
 const PHYSICAL_GAME_CATEGORIES = new Set<GameCategory>([
@@ -63,7 +70,11 @@ function weightedRandomOrder(games: GameSummary[], pool: DiscoveryPool) {
   return ordered;
 }
 
-export function GameBrowser({ games }: GameBrowserProps) {
+export function GameBrowser({
+  canVote = false,
+  games,
+  viewerVotes = {},
+}: GameBrowserProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const hasAppliedRandomIntent = useRef(false);
@@ -381,7 +392,11 @@ export function GameBrowser({ games }: GameBrowserProps) {
         <div className="space-y-3">
           {visibleGames.map((game, index) => (
             <div className="space-y-3" key={game.id}>
-              <GameCard game={game} />
+              <GameCard
+                canVote={canVote}
+                game={game}
+                initialVote={viewerVotes[game.id] ?? null}
+              />
               {index === 1 ? <AdPlaceholder /> : null}
             </div>
           ))}

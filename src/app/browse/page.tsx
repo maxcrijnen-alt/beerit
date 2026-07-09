@@ -6,6 +6,7 @@ import { GameBrowser } from "@/components/games/game-browser";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchGames } from "@/lib/games/queries";
+import { fetchViewerGameVotes } from "@/lib/social/queries";
 import { getViewer } from "@/lib/auth/viewer";
 import { logDevelopmentError } from "@/lib/dev-log";
 import { cn } from "@/lib/utils";
@@ -83,6 +84,10 @@ function BrowseLayout({
 
 export default async function BrowsePage() {
   const [viewer, gamesResult] = await Promise.all([getViewer(), getBrowseGames()]);
+  const viewerVotes = await fetchViewerGameVotes(viewer).catch((error) => {
+    logDevelopmentError("Could not load viewer votes for browse.", error);
+    return {};
+  });
 
   if (gamesResult.hasError) {
     return (
@@ -102,7 +107,11 @@ export default async function BrowsePage() {
           Find a game for your group and start a lobby when you are ready.
         </p>
       </div>
-      <GameBrowser games={gamesResult.games} />
+      <GameBrowser
+        canVote={Boolean(viewer)}
+        games={gamesResult.games}
+        viewerVotes={viewerVotes}
+      />
     </div>
   );
 
