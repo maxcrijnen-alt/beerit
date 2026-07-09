@@ -1,6 +1,6 @@
 "use client";
 
-import { Bomb, Pause, Play, RotateCcw, Timer } from "lucide-react";
+import { Bomb, Eye, EyeOff, Pause, Play, RotateCcw, Timer } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,6 +41,8 @@ export function BombModeTimer({
   const [remaining, setRemaining] = useState(duration);
   const [running, setRunning] = useState(isHost);
   const [exploded, setExploded] = useState(false);
+  // Hidden countdown is the default; hosts can reveal it for beginner groups.
+  const [showCountdown, setShowCountdown] = useState(false);
   const explodedRef = useRef(false);
   const active = isHost && running && remaining > 0;
 
@@ -146,10 +148,29 @@ export function BombModeTimer({
                   active ? "animate-pulse motion-reduce:animate-none" : ""
                 }`}
               />
-              {active ? "Tick… tick…" : "Paused"}
+              {showCountdown
+                ? `${remaining}s`
+                : active
+                  ? "Tick… tick…"
+                  : "Paused"}
             </p>
           </div>
           <div className="flex gap-2">
+            <Button
+              aria-label={
+                showCountdown ? "Hide the countdown" : "Show the countdown"
+              }
+              onClick={() => setShowCountdown((value) => !value)}
+              size="icon"
+              type="button"
+              variant="ghost"
+            >
+              {showCountdown ? (
+                <EyeOff className="size-4" />
+              ) : (
+                <Eye className="size-4" />
+              )}
+            </Button>
             <Button
               aria-label={active ? "Pause bomb timer" : "Resume bomb timer"}
               onClick={() => setRunning((value) => !value)}
@@ -171,8 +192,9 @@ export function BombModeTimer({
           </div>
         </div>
         <p className="text-xs leading-5 text-muted-foreground">
-          Pass it around. The duration is random for this card, so nobody —
-          not even the host — knows when it blows.
+          {showCountdown
+            ? "Visible countdown is on — handy for beginner groups. Tap the eye to make it a surprise again."
+            : "Pass it around. The duration is random for this card, so nobody — not even the host — knows when it blows."}
         </p>
       </CardContent>
     </Card>
