@@ -277,7 +277,8 @@ export async function deleteSessionQuestionAction(formData: FormData) {
   const { error } = await actor.supabase
     .from("lobby_session_questions")
     .delete()
-    .eq("id", parsed.data.questionId);
+    .eq("id", parsed.data.questionId)
+    .eq("lobby_id", parsed.data.lobbyId);
 
   if (error) {
     return lobbyError("Only the host or the submitter can remove a question.");
