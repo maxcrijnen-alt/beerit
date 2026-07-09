@@ -17,6 +17,7 @@ import {
   leaveLobbySchema,
   scoreAndAdvanceLobbySchema,
   sendLobbyMessageSchema,
+  setBalanceWeightSchema,
   undoLastQuickResultSchema,
 } from "@/lib/validation/lobbies";
 
@@ -227,6 +228,26 @@ export async function sendLobbyMessageAction(formData: FormData) {
 
   if (error) {
     return lobbyError("Could not send the message.");
+  }
+
+  return { status: "success" } satisfies ActionState;
+}
+
+export async function setLobbyBalanceWeightAction(formData: FormData) {
+  const parsed = setBalanceWeightSchema.safeParse(Object.fromEntries(formData));
+  const actor = await getLobbyActor();
+
+  if (!parsed.success || !actor) {
+    return lobbyError("Could not update the balance weight.");
+  }
+
+  const { error } = await actor.supabase.rpc("set_lobby_balance_weight", {
+    p_lobby_id: parsed.data.lobbyId,
+    p_weight: parsed.data.weight,
+  });
+
+  if (error) {
+    return lobbyError("Only the host can change the balance weight.");
   }
 
   return { status: "success" } satisfies ActionState;

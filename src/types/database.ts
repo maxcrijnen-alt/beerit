@@ -217,6 +217,7 @@ export type LobbyControl = (typeof LOBBY_CONTROLS)[number];
 export interface Lobby {
   activity_kinds: GameActivityKind[];
   activity_selection_mode: LobbyActivitySelectionMode;
+  balance_weight: number;
   code: string;
   created_at: string;
   current_card_index: number;
