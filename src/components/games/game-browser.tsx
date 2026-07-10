@@ -96,7 +96,6 @@ export function GameBrowser({
     recentRandomGameIds,
     setPool,
     setRandomCategories,
-    setRandomIntensities,
     setSort,
     sort,
   } = useGameFiltersStore();
@@ -183,13 +182,14 @@ export function GameBrowser({
     [recentRandomGameIds, visibleGames],
   );
   const pushRandomLobby = useCallback(
-    (game: Pick<GameSummary, "category" | "id">) => {
+    (game: Pick<GameSummary, "category" | "id">, pickedPool?: DiscoveryPool) => {
       addRecentRandomGameId(game.id);
       router.push(
         buildRandomLobbyCreateHref({
           categoryFilter: category,
           contentMode,
           game,
+          pool: pickedPool,
         }),
       );
     },
@@ -200,13 +200,14 @@ export function GameBrowser({
 
     if (surprise) {
       setRandomCategories([...GAME_CATEGORIES]);
-      setRandomIntensities([...GAME_INTENSITIES]);
       setPool("SURPRISE");
     }
 
+    // Surprise widens everything except the vibe: Spicy/Chaos stay an
+    // explicit opt-in and are never re-enabled behind the group's back.
     const pickPool = surprise ? "SURPRISE" : pool;
     const pickCategories = surprise ? [] : randomCategories;
-    const pickIntensities = surprise ? [] : randomIntensities;
+    const pickIntensities = randomIntensities;
     const pickContentMode = surprise ? "BOTH" : contentMode;
     const pickPlayers = surprise ? null : players;
     const pickDuration = surprise ? null : durationMaxMinutes;
@@ -279,7 +280,7 @@ export function GameBrowser({
           const pickedGame = games.find((game) => game.id === result.gameId);
 
           if (pickedGame) {
-            pushRandomLobby(pickedGame);
+            pushRandomLobby(pickedGame, pickPool);
             return;
           }
 
@@ -296,7 +297,7 @@ export function GameBrowser({
         }
 
         setRandomMessage(result.message);
-        pushRandomLobby(picked);
+        pushRandomLobby(picked, pickPool);
       } catch (error) {
         logDevelopmentError("Could not pick a random game.", error);
         const picked = pickLocalCandidate();
@@ -306,7 +307,7 @@ export function GameBrowser({
           return;
         }
 
-        pushRandomLobby(picked);
+        pushRandomLobby(picked, pickPool);
       } finally {
         setIsPickingRandom(false);
       }
@@ -328,7 +329,6 @@ export function GameBrowser({
     router,
     setPool,
     setRandomCategories,
-    setRandomIntensities,
   ]);
 
 

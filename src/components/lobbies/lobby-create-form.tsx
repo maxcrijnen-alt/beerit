@@ -19,6 +19,14 @@ interface LobbyCreateFormProps {
   gameId: string;
 }
 
+const POOL_EXPLANATIONS: Record<string, string> = {
+  HOT: "the balanced mix of liked and fresh games",
+  MOST_LIKED: "the most liked games",
+  RECENT: "the freshest new games",
+  SURPRISE: "a full wildcard draw",
+  TOP: "the best rated games",
+};
+
 const ACTIVITY_LABELS: Record<GameActivityKind, string> = {
   BOARD_GAME: "Board games, such as chess",
   CARD_GAME: "Card games",
@@ -63,11 +71,28 @@ export function LobbyCreateForm({
     <form action={action} className="space-y-3">
       <input name="gameId" type="hidden" value={gameId} />
       {defaults?.source === "random" ? (
-        <p className="rounded-lg bg-secondary p-3 text-xs leading-5 text-muted-foreground">
-          Random picked this game from your filters. The lobby settings below
-          were prefilled, but you can still change them before creating the
-          room.
-        </p>
+        <div className="space-y-1.5 rounded-lg bg-secondary p-3 text-xs leading-5 text-muted-foreground">
+          <p className="font-medium text-foreground">Why this game?</p>
+          <ul className="list-inside list-disc space-y-0.5">
+            <li>It matches your category and vibe filters.</li>
+            {defaults.pickedContentMode === "DIGITAL" ? (
+              <li>Prompt-only: no materials needed.</li>
+            ) : defaults.pickedContentMode === "PHYSICAL" ? (
+              <li>It fits the gear your group has available.</li>
+            ) : null}
+            {defaults.pickedPool ? (
+              <li>
+                Picked via{" "}
+                {POOL_EXPLANATIONS[defaults.pickedPool] ?? "your ranking mode"}.
+              </li>
+            ) : null}
+            <li>Games you played recently on this device were skipped.</li>
+          </ul>
+          <p>
+            The lobby settings below were prefilled, but you can still change
+            them before creating the room.
+          </p>
+        </div>
       ) : null}
       <label className="flex items-start gap-3 rounded-lg border border-border p-3 text-sm">
         <input
