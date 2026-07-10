@@ -8,7 +8,7 @@ import type {
   GameCategory,
   GameIntensity,
 } from "@/types/database";
-import { GAME_CATEGORIES, GAME_INTENSITIES } from "@/types/database";
+import { GAME_CATEGORIES } from "@/types/database";
 
 export type { DiscoveryContentMode };
 export type GameSort = "liked" | "new" | "random" | "top" | "trending";
@@ -51,9 +51,10 @@ const initialFilters = {
   pool: "HOT" as const,
   players: null,
   query: "",
-  // All filters selected by default: random discovery starts wide open.
+  // Categories start wide open, but Spicy and Chaos vibes are an explicit
+  // opt-in: 18+/spicy content never appears without the group choosing it.
   randomCategories: [...GAME_CATEGORIES],
-  randomIntensities: [...GAME_INTENSITIES],
+  randomIntensities: ["Soft", "Funny"] as GameIntensity[],
   sort: "trending" as const,
 };
 
